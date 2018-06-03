@@ -13,6 +13,9 @@ class CryptoBot:
     def start_trading(self):
         pass
 
+    def stop_trading(self):
+        pass
+
 
 if __name__ == '__main__':
 
