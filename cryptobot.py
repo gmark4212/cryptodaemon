@@ -25,6 +25,11 @@ class CryptoBot:
             else:
                 return currencies_balances
 
+    def get_summ_to_spend_to_buy(self):
+        if self.strategy and self.base_balance>0:
+            return self.base_balance * (self.strategy.deposit_threshold_pct/100)
+        return 0
+
     def start_trading(self):
         pass
 
