@@ -7,7 +7,7 @@ from coinmarketcap import Market
 class Strategy:
     def __init__(self, exchange=None, **kwargs):
         self.exchange = exchange if exchange else DEFAULT_EXCHANGE
-        self.type = 'scalping'
+        self.type = SCALPING
         self.purchase_different_coins = 3  # 3-10 recommended
         self.drop_range_to_buy_pct = range(-40, -10)
         self.deposit_threshold_pct = 50

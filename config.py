@@ -25,4 +25,7 @@ DEFAULT_EXCHANGE = hitbtc2({
 BASE_TICKER = 'BTC'
 USD = 'USD'
 
+# strategies
+SCALPING = 'scalping'
+
 
