@@ -5,19 +5,22 @@ from coinmarketcap import Market
 
 
 class Strategy:
-    def __init__(self, exchange=None):
+    def __init__(self, exchange=None, **kwargs):
         self.exchange = exchange if exchange else DEFAULT_EXCHANGE
         self.type = 'scalping'
-        self.purchase_different_coins = 3
+        self.purchase_different_coins = 3  # 3-10 recommended
         self.drop_range_to_buy_pct = range(-40, -10)
         self.deposit_threshold_pct = 50
-        self.capitalization_threshold_usd = float(50000000.0)
+        self.capitalization_threshold_usd = float(50000000.0)  # > 30 billions recommended
         self.market_volume_threshold_usd_24h = 500000
         self.your_margin_pct = 10
         self.market = Market()
         self.drops = None
         self.suitable_coins_marketcap = {}
         self.coins_listing = {item['symbol']: {'id': item['id'], 'name': item['name']} for item in self.market.listings()['data']}
+        for key in kwargs:
+            if hasattr(self, key):
+                self[key] = kwargs[key]
 
     def fetch_suitable_coins(self):
         tickers = self.exchange.fetch_tickers()
@@ -43,4 +46,5 @@ class Strategy:
 # if __name__ == '__main__':
 #
 #     s = Strategy()
+#     print(s.capitalization_threshold_usd )
 #     s.fetch_suitable_coins()
