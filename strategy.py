@@ -7,7 +7,7 @@ from coinmarketcap import Market
 class Strategy:
     def __init__(self, exchange=None, **kwargs):
         self.exchange = exchange if exchange else DEFAULT_EXCHANGE
-        self.type = SCALPING
+        self.type = ROLLBACK
         self.purchase_different_coins = 3  # 3-10 recommended
         self.drop_range_to_buy_pct = range(-40, -10)
         self.deposit_threshold_pct = 50
@@ -17,6 +17,7 @@ class Strategy:
         self.market = Market()
         self.drops = None
         self.suitable_coins_marketcap = {}
+        self.suitable_tickers = []
         self.coins_listing = {item['symbol']: {'id': item['id'], 'name': item['name']} for item in self.market.listings()['data']}
         for key in kwargs:
             if hasattr(self, key):
@@ -25,8 +26,7 @@ class Strategy:
     def fetch_suitable_coins(self):
         tickers = self.exchange.fetch_tickers()
         self.drops = {pair: data for pair, data in tickers.items()
-                      if pair.endswith(BASE_TICKER) and int(data['percentage']) in self.drop_range_to_buy_pct}
-
+                      if pair.endswith(BASE_TICKER) and data['percentage'] is not None and int(data['percentage']) in self.drop_range_to_buy_pct}
         if self.market:
             for pair, market_data in self.drops.items():
                 ticker = pair.split('/')[0]
@@ -38,13 +38,17 @@ class Strategy:
                         if isinstance(capital, float):
                             if capital >= self.capitalization_threshold_usd:
                                     print(ticker, capital)
-                                    self.suitable_coins_marketcap[ticker] = market_data
+                                    self.suitable_coins_marketcap[ticker] = capital
                 else:
                     print('Не могу узнать капитализацию: {}, пропускаю'.format(ticker))
 
+                if len(self.suitable_coins_marketcap) > 0:
+                    scm = self.suitable_coins_marketcap
+                    self.suitable_tickers = sorted(scm, key=scm.get, reverse=True)[:self.purchase_different_coins]
 
-# if __name__ == '__main__':
-#
-#     s = Strategy()
-#     print(s.capitalization_threshold_usd )
-#     s.fetch_suitable_coins()
+
+if __name__ == '__main__':
+
+    s = Strategy()
+    s.fetch_suitable_coins()
+    print(s.suitable_tickers)

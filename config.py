@@ -7,6 +7,7 @@ from ccxt import hitbtc2
 # general
 APP_NAME = 'CryptoDaemonBot'
 APP_VERSION = '0.2'
+INTERVAL = 30
 
 # dirs
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +27,10 @@ BASE_TICKER = 'BTC'
 USD = 'USD'
 
 # strategies
-SCALPING = 'scalping'
+ROLLBACK = 'rollback'
+
+# sides
+SELL = 'sell'
+BUY = 'buy'
 
 
