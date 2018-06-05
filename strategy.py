@@ -26,7 +26,8 @@ class Strategy:
     def fetch_suitable_coins(self):
         tickers = self.exchange.fetch_tickers()
         self.drops = {pair: data for pair, data in tickers.items()
-                      if pair.endswith(BASE_TICKER) and data['percentage'] is not None and int(data['percentage']) in self.drop_range_to_buy_pct}
+                      if pair.endswith(BASE_TICKER) and data['percentage'] is not None and int(data['percentage'])
+                      in self.drop_range_to_buy_pct}
         if self.market:
             for pair, market_data in self.drops.items():
                 ticker = pair.split('/')[0]
@@ -41,7 +42,6 @@ class Strategy:
                                     self.suitable_coins_marketcap[ticker] = capital
                 else:
                     print('Не могу узнать капитализацию: {}, пропускаю'.format(ticker))
-
                 if len(self.suitable_coins_marketcap) > 0:
                     scm = self.suitable_coins_marketcap
                     self.suitable_tickers = sorted(scm, key=scm.get, reverse=True)[:self.purchase_different_coins]
