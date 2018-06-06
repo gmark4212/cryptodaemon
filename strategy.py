@@ -48,8 +48,8 @@ class Strategy:
                     self.suitable_tickers = sorted(scm, key=scm.get, reverse=True)[:self.purchase_different_coins]
 
 
-# if __name__ == '__main__':
-#
-#     s = Strategy()
-#     s.fetch_suitable_coins()
-#     print(s.suitable_tickers)
+if __name__ == '__main__':
+
+    s = Strategy()
+    s.fetch_suitable_coins()
+    print(s.suitable_tickers)
