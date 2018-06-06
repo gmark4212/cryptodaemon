@@ -19,6 +19,7 @@ class Strategy:
         self.suitable_coins_marketcap = {}
         self.suitable_tickers = []
         self.coins_listing = {item['symbol']: {'id': item['id'], 'name': item['name']} for item in self.market.listings()['data']}
+        self.crypto_only = False  # include tokens, ico etc.
         for key in kwargs:
             if hasattr(self, key):
                 self[key] = kwargs[key]
@@ -47,8 +48,8 @@ class Strategy:
                     self.suitable_tickers = sorted(scm, key=scm.get, reverse=True)[:self.purchase_different_coins]
 
 
-if __name__ == '__main__':
-
-    s = Strategy()
-    s.fetch_suitable_coins()
-    print(s.suitable_tickers)
+# if __name__ == '__main__':
+#
+#     s = Strategy()
+#     s.fetch_suitable_coins()
+#     print(s.suitable_tickers)
