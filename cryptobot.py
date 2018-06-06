@@ -1,15 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+import sys
 from config import *
-import argparse
 import storage, telegram
 from strategy import Strategy
 from time import sleep
 
 
 class CryptoBot:
-    def __init__(self, trading_strategy=None):
+    def __init__(self, trading_strategy=None, emulation_mode=False):
         self.base_balance = None
         self.money_per_buy_order = 0
         self.keep_working = True
@@ -71,6 +70,5 @@ class CryptoBot:
 
 
 if __name__ == '__main__':
-
-    bot = CryptoBot(Strategy())
+    bot = CryptoBot(Strategy(), '-e' in sys.argv)
     bot.start_trading()
