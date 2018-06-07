@@ -5,21 +5,23 @@ from config import *
 import storage, telegram, emulator
 from strategy import Strategy
 from time import sleep
+from emulator import MockExchange
 
 
 class CryptoBot:
-    def __init__(self, trading_strategy=None, emulation_mode=False):
+    def __init__(self, trading_strategy, emulation_mode=False):
         self.base_balance = None
         self.money_per_buy_order = 0
         self.keep_working = True
         self._buy_orders = []
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
+            self.exchange = MockExchange() if emulation_mode else self.strategy.exchange
         else:
             raise TypeError
 
     def fetch_balance(self, base_currency_only=True):
-        data = self.strategy.exchange.fetch_balance()
+        data = self.exchange.fetch_balance()
         currencies_balances = data['info']
         if base_currency_only:
             for balance in currencies_balances:
@@ -30,10 +32,10 @@ class CryptoBot:
             return currencies_balances
 
     def fetch_prices(self, pair):
-        return self.strategy.exchange.fetch_ticker(pair)['last']
+        return self.exchange.fetch_ticker(pair)['last']
 
     def fetch_my_open_orders(self, pair=None):
-        return self.strategy.exchange.fetch_open_orders(self, symbol=pair)
+        return self.exchange.fetch_open_orders(self, symbol=pair)
 
     def get_summ_to_spend_to_buy(self):
         if self.base_balance>0:
@@ -41,13 +43,13 @@ class CryptoBot:
         return 0
 
     def get_order_state(self, oid):
-        return self.strategy.exchange.fetch_order(self, id=oid)['status']
+        return self.exchange.fetch_order(self, id=oid)['status']
 
     def place_order(self, symbol, amount, price, side=None):
         if bool(side) and bool(symbol) and amount > 0 and price > 0:
             # todo: 1/limit type must be 'Good-Till-Cancelled'
             # todo: 2/process error orders. Return None or False if error
-            return self.strategy.exchange.create_order(symbol, 'limit', side, amount, price)
+            return self.exchange.create_order(symbol, 'limit', side, amount, price)
 
     def start_trading(self):
         self.keep_working = True

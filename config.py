@@ -9,6 +9,9 @@ APP_NAME = 'CryptoDaemonBot'
 APP_VERSION = '0.2'
 INTERVAL = 30
 
+# emulation
+FAKE_DEPOSIT = 10
+
 # dirs
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
