@@ -36,4 +36,5 @@ ROLLBACK = 'rollback'
 SELL = 'sell'
 BUY = 'buy'
 
-
+# emilation
+FAKE_BALANCE = 0.10
