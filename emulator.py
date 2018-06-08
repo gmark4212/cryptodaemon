@@ -57,6 +57,3 @@ class MockExchange:
         self.orders.append(order)
         self.order_id += 1
         return order
-
-e = MockExchange()
-print(e.fetch_ticker('VERI/BTC'))
