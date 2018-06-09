@@ -6,12 +6,13 @@ from coinmarketcap import Market
 
 class Strategy:
     def __init__(self, exchange=None, **kwargs):
+        print('Strategy initializing...')
         self.exchange = exchange if exchange else DEFAULT_EXCHANGE
         self.type = ROLLBACK
         self.purchase_different_coins = 3  # 3-10 recommended
         self.drop_range_to_buy_pct = range(-40, -10)
         self.deposit_threshold_pct = 50
-        self.capitalization_threshold_usd = float(50000000.0)  # > 30 billions recommended
+        self.capitalization_threshold_usd = float(20000000.0)  # > 30 billions recommended
         self.market_volume_threshold_usd_24h = 500000
         self.your_margin_pct = 10
         self.market = Market()
@@ -42,7 +43,7 @@ class Strategy:
                                     print(ticker, capital)
                                     self.suitable_coins_marketcap[ticker] = capital
                 else:
-                    print('Не могу узнать капитализацию: {}, пропускаю'.format(ticker))
+                    print('Capitalization is unknown: {}... pass'.format(ticker))
                 if len(self.suitable_coins_marketcap) > 0:
                     scm = self.suitable_coins_marketcap
                     self.suitable_tickers = sorted(scm, key=scm.get, reverse=True)[:self.purchase_different_coins]
