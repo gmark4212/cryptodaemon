@@ -62,7 +62,10 @@ class CryptoBot:
         balance = {SELL: 0, BUY: 0}
         trades = self.exchange.fetch_my_trades(since=since)
         for i in trades:
-            balance[i['side']] += float(i['price']) + float(i['fee'])
+            side = i['side']
+            trade_summ = float(i['price']) + float(i['fee']) if BUY else float(i['price']) - float(i['fee'])
+            balance[side] += trade_summ
+
         return balance[SELL] - balance[BUY]
 
     def start_trading(self):
