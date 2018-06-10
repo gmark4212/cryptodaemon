@@ -55,9 +55,11 @@ class CryptoBot:
                 if order['side'] == BUY:
                     self.db.store_order(order)
             except Exception:
-                order = None
+                pass
         return order
 
+    def calculate_profit(self, since):
+        pass
 
     def start_trading(self):
         self.keep_working = True

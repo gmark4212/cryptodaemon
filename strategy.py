@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from config import *
 from coinmarketcap import Market
+import json
 
 
 class Strategy:
@@ -21,15 +22,27 @@ class Strategy:
         self.suitable_tickers = []
         self.coins_listing = {item['symbol']: {'id': item['id'], 'name': item['name']} for item in self.market.listings()['data']}
         self.crypto_only = False  # include tokens, ico etc.
+        self.currencies = None
         for key in kwargs:
             if hasattr(self, key):
                 self[key] = kwargs[key]
 
+    def fetch_currencies(self):
+        curs = self.exchange.fetch_currencies()
+        if self.crypto_only:
+            curs = dict((k + '/' + BASE_TICKER, v) for k, v in curs.items() if v['type'] == 'crypto')
+        else:
+            curs = dict((k + '/' + BASE_TICKER, v) for k, v in curs.items())
+        self.currencies = curs
+
     def fetch_suitable_coins(self):
+        self.fetch_currencies()
         tickers = self.exchange.fetch_tickers()
         self.drops = {pair: data for pair, data in tickers.items()
-                      if pair.endswith(BASE_TICKER) and data['percentage'] is not None and int(data['percentage'])
-                      in self.drop_range_to_buy_pct}
+                      if pair.endswith(BASE_TICKER)
+                      and data['percentage'] is not None
+                      and int(data['percentage']) in self.drop_range_to_buy_pct
+                      and pair in self.currencies}
         if self.market:
             for pair, market_data in self.drops.items():
                 ticker = pair.split('/')[0]
