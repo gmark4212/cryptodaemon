@@ -61,7 +61,6 @@ class MockExchange:
         self.orders.append(order)
         self.order_id += 1
         return order
-<<<<<<< HEAD
 
     def fetch_bid_orders(self,pair): # Ордера на покупку [сумма : количество]
         info = DEFAULT_EXCHANGE.fetchOrderBook(pair)
@@ -94,5 +93,3 @@ class MockExchange:
         self.trade_id += 1
         self.trades.append(trade)
 
-=======
->>>>>>> 884acd30058d3cd824066667c387197a2d87dbad
