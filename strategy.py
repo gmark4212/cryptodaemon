@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from config import *
 from coinmarketcap import Market
-import json
 
 
 class Strategy:

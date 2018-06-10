@@ -59,7 +59,11 @@ class CryptoBot:
         return order
 
     def calculate_profit(self, since):
-        pass
+        balance = {}
+        trades = self.exchange.fetch_my_trades(since=since)
+        for i in trades:
+            balance[i['side']] += i['price'] + i['fee']
+        return balance[SELL] - balance[BUY]
 
     def start_trading(self):
         self.keep_working = True
