@@ -7,7 +7,8 @@ from ccxt import hitbtc2
 # general
 APP_NAME = 'CryptoDaemonBot'
 APP_VERSION = '0.2'
-INTERVAL = 30
+INTERVAL = 6
+DEFAULT_HOST = '127.0.0.1'
 
 # emulation
 FAKE_DEPOSIT = 10
@@ -36,5 +37,9 @@ ROLLBACK = 'rollback'
 SELL = 'sell'
 BUY = 'buy'
 
-# emilation
+# emulation
 FAKE_BALANCE = 0.10
+
+# database
+MONGODB_PORT = 27017
+MONGO_DB_NAME = 'cryptodaemon'
