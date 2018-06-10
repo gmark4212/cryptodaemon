@@ -59,10 +59,10 @@ class CryptoBot:
         return order
 
     def calculate_profit(self, since):
-        balance = {}
+        balance = {SELL: 0, BUY: 0}
         trades = self.exchange.fetch_my_trades(since=since)
         for i in trades:
-            balance[i['side']] += i['price'] + i['fee']
+            balance[i['side']] += float(i['price']) + float(i['fee'])
         return balance[SELL] - balance[BUY]
 
     def start_trading(self):
