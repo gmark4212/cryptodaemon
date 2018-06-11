@@ -44,8 +44,10 @@ class CryptoBot:
             return self.base_balance * ((100-self.strategy.deposit_threshold_pct)/100)
         return 0
 
-    def get_order_state(self, oid):
-        return self.exchange.fetch_order(self, id=oid)['status']
+    def get_order_state(self, oid): #???? в oid попадает весь ордер а не его номер ????
+        if oid:
+            oid = oid['id']
+            return self.exchange.fetch_order(self, id=oid)['status']
 
     def place_order(self, symbol, amount, price, side=None):
         order = None
@@ -55,7 +57,8 @@ class CryptoBot:
                 order = self.exchange.create_order(symbol, typer, side, amount, price)
                 if self.db and order['side'] == BUY:
                     self.db.store_order(order)
-            except Exception:
+            except Exception as e:
+                print(e)
                 pass
         return order
 
@@ -113,7 +116,9 @@ class CryptoBot:
 
 
 if __name__ == '__main__':
-    bot = CryptoBot(Strategy(), '-e' in sys.argv)
+    # bot = CryptoBot(Strategy(), '-e' in sys.argv )
+    bot = CryptoBot(Strategy(), True) # '-e' in sys.argv выдает False
     bot.start_trading()
+
 
 
