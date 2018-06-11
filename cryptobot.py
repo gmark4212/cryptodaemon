@@ -16,6 +16,8 @@ class CryptoBot:
         self._buy_orders = []
         if STORE_ORDERS:
             self.db = BotDataStorage()
+        else: # без этого выдает ошибку
+            self.db = None
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
             self.exchange = MockExchange() if emulation_mode else self.strategy.exchange
@@ -47,7 +49,7 @@ class CryptoBot:
     def get_order_state(self, oid): #???? в oid попадает весь ордер а не его номер ????
         if oid:
             oid = oid['id']
-            return self.exchange.fetch_order(self, id=oid)['status']
+            return self.exchange.fetch_order(id=oid)['status']
 
     def place_order(self, symbol, amount, price, side=None):
         order = None
@@ -90,12 +92,13 @@ class CryptoBot:
                             self.money_per_buy_order = whole_money_to_spend/tickers_quantity
                             print('MONEY FOR 1 ORDER: ', self.money_per_buy_order)
                             for symbol in s.suitable_tickers:
-                                price = self.fetch_prices('{}/{}'.format(symbol, BASE_TICKER))
+                                price = self.fetch_prices('{}/{}'.format(symbol, BASE_TICKER))#Почему при запросе цены ты создаешь пару
                                 print('LAST PRICE FOR {}: {} '.format(symbol, price))
                                 if price > 0:
                                     amount = round(self.money_per_buy_order/price, -3)
                                     print('AMOUNT TO BUY {}: {} '.format(symbol, amount))
-                                    self._buy_orders.append(self.place_order(symbol, amount, price, BUY))
+                                    # self._buy_orders.append(self.place_order(symbol, amount, price, BUY))
+                                    self._buy_orders.append(self.place_order('{}/{}'.format(symbol, BASE_TICKER), amount, price, BUY))#а при выставлении нет ПОМЕТИЛ ЭТО САМОЕ МЕСТО
                 else:
                     print('No suitable coins for this strategy at the moment')
 
@@ -105,7 +108,8 @@ class CryptoBot:
                         # check order state. sell when executed
                         price = buy_order['price']
                         stop_price = price + (price * (s.your_margin_pct / 100))
-                        sell_order = self.place_order(buy_order['symbol'], buy_order['quantity'], stop_price, SELL)
+                        # sell_order = self.place_order(buy_order['symbol'], buy_order['quantity'], stop_price, SELL)
+                        sell_order = self.place_order(buy_order['symbol'], buy_order['amount'], stop_price, SELL) #quantity атрибет сделок а не ордеров
                         if sell_order:
                             if self.db:
                                 self.db.store_order(sell_order)

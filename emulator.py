@@ -102,6 +102,7 @@ class MockExchange:
             # print(order['filled'], '+', trade['amount'])
             order['filled'] = float(order['filled']) + float(trade['amount'])
             # print(order['filled'])
+        print(trade)
         self.trades.append(trade)
 
 
@@ -111,8 +112,14 @@ class MockExchange:
             if order['status'] == 'open':
                 if trade['side'] == order['side']:
                     if float(trade['price']) >= float(order['price']):
-                        # self.add_trade(trade, order)
+                        # self.add_trade(trade, order) # Если проверять сделки за сутки
                         if int(trade['timestamp']) >= int(order['timestamp']):
                             self.add_trade(trade, order)
             else:
                 break
+
+if __name__ =='__main__':
+    e = MockExchange()
+    order = e.create_order('LTC/BTC','stopLimit','buy',5,0.015)
+    e.find_same_trades(order)
+    print(order)
