@@ -38,7 +38,7 @@ SELL = 'sell'
 BUY = 'buy'
 
 # emulation
-FAKE_BALANCE = 0.10
+FAKE_BALANCE = 2.10
 
 # database
 MONGODB_PORT = 27017
