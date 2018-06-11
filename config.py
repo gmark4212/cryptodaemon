@@ -9,6 +9,7 @@ APP_NAME = 'CryptoDaemonBot'
 APP_VERSION = '0.2'
 INTERVAL = 6
 DEFAULT_HOST = '127.0.0.1'
+API_PORT = '8888'
 
 # emulation
 FAKE_DEPOSIT = 10
@@ -43,3 +44,4 @@ FAKE_BALANCE = 0.10
 # database
 MONGODB_PORT = 27017
 MONGO_DB_NAME = 'cryptodaemon'
+STORE_ORDERS = False

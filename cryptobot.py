@@ -14,7 +14,8 @@ class CryptoBot:
         self.money_per_buy_order = 0
         self.keep_working = True
         self._buy_orders = []
-        self.db = BotDataStorage()
+        if STORE_ORDERS:
+            self.db = BotDataStorage()
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
             self.exchange = MockExchange() if emulation_mode else self.strategy.exchange
@@ -52,7 +53,7 @@ class CryptoBot:
             typer = 'stopLimit' if side == SELL else 'limit'
             try:
                 order = self.exchange.create_order(symbol, typer, side, amount, price)
-                if order['side'] == BUY:
+                if self.db and order['side'] == BUY:
                     self.db.store_order(order)
             except Exception:
                 pass
@@ -93,8 +94,9 @@ class CryptoBot:
                                     print('AMOUNT TO BUY {}: {} '.format(symbol, amount))
                                     self._buy_orders.append(self.place_order(symbol, amount, price, BUY))
                 else:
-                    print('No suitable coins for this strategy at a moment')
+                    print('No suitable coins for this strategy at the moment')
 
+                sleep(INTERVAL)
                 for buy_order in self._buy_orders:
                     if self.get_order_state(buy_order) == 'filled':
                         # check order state. sell when executed
@@ -102,9 +104,9 @@ class CryptoBot:
                         stop_price = price + (price * (s.your_margin_pct / 100))
                         sell_order = self.place_order(buy_order['symbol'], buy_order['quantity'], stop_price, SELL)
                         if sell_order:
-                            self.db.store_order(sell_order)
+                            if self.db:
+                                self.db.store_order(sell_order)
                             self._buy_orders.remove(buy_order)
-                sleep(INTERVAL)
 
     def stop_trading(self):
         self.keep_working = False
