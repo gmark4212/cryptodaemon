@@ -111,7 +111,7 @@ class MockExchange:
             if order['status'] == 'open':
                 if trade['side'] == order['side']:
                     if float(trade['price']) >= float(order['price']):
-                        self.add_trade(trade, order)
+                        # self.add_trade(trade, order)
                         if int(trade['timestamp']) >= int(order['timestamp']):
                             self.add_trade(trade, order)
             else:
