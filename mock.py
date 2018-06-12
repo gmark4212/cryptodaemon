@@ -122,6 +122,7 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             'info': order,
         }
 
+    @staticmethod
     def fetch_ticker(self, pair):
         return DEFAULT_EXCHANGE.fetch_ticker(pair)
 
