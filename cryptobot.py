@@ -44,17 +44,18 @@ class CryptoBot:
             return self.base_balance * ((100-self.strategy.deposit_threshold_pct)/100)
         return 0
 
-    def get_order_state(self, oid): #???? в oid попадает весь ордер а не его номер ????
-        if oid:
-            oid = oid['id']
-            return self.exchange.fetch_order(self, id=oid)['status']
+    def get_order_state(self, order):
+        if isinstance(order, dict):
+            if order.get('id') is not None:
+                return self.exchange.fetch_order(self, id=order['id'])['status']
 
     def place_order(self, symbol, amount, price, side=None):
         order = None
         if bool(side) and bool(symbol) and amount > 0 and price > 0:
-            typer = 'stopLimit' if side == SELL else 'limit'
+            typer = STOP_LIMIT if side == SELL else LIMIT
+            params = dict(stopPrice=price) if side == SELL else {}
             try:
-                order = self.exchange.create_order(symbol, typer, side, amount, price)
+                order = self.exchange.create_order(symbol, typer, side, amount, price, params)
                 if self.db and order['side'] == BUY:
                     self.db.store_order(order)
             except Exception as e:
@@ -75,6 +76,7 @@ class CryptoBot:
         self.keep_working = True
         s = self.strategy
         print('Starting trade...')
+        print(self.base_balance)
         if s.type == ROLLBACK:
             while self.keep_working:
                 s.fetch_suitable_coins()
@@ -101,7 +103,7 @@ class CryptoBot:
 
                 sleep(INTERVAL)
                 for buy_order in self._buy_orders:
-                    if self.get_order_state(buy_order) == 'filled':
+                    if self.get_order_state(buy_order) == EXECUTED:
                         # check order state. sell when executed
                         price = buy_order['price']
                         stop_price = price + (price * (s.your_margin_pct / 100))
@@ -116,9 +118,5 @@ class CryptoBot:
 
 
 if __name__ == '__main__':
-    # bot = CryptoBot(Strategy(), '-e' in sys.argv )
-    bot = CryptoBot(Strategy(), True) # '-e' in sys.argv выдает False
+    bot = CryptoBot(Strategy(), '-e' in sys.argv)
     bot.start_trading()
-
-
-

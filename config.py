@@ -27,6 +27,8 @@ DEFAULT_EXCHANGE = hitbtc2({
     "enableRateLimit": True,
 })
 
+DEFAULT_EXCH_CLASS = DEFAULT_EXCHANGE.__class__
+
 # currency
 BASE_TICKER = 'BTC'
 USD = 'USD'
@@ -37,6 +39,20 @@ ROLLBACK = 'rollback'
 # sides
 SELL = 'sell'
 BUY = 'buy'
+
+# order statuses
+NEW = 'new'
+SUSPENDED = 'suspended'
+PARTIAL = 'partiallyFilled'
+EXECUTED = 'filled'
+CANCELED = 'canceled'
+EXPIRED = 'expired'
+
+# order types
+LIMIT = 'limit'
+MARKET = 'market'
+STOP_LIMIT = 'stopLimit'
+STOP_MARKET = 'stopMarket'
 
 # emulation
 FAKE_BALANCE = 2.10
