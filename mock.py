@@ -3,7 +3,6 @@
 
 from config import *
 from storage import BotDataStorage
-import requests
 
 
 class FakeExchange(DEFAULT_EXCH_CLASS):
@@ -12,7 +11,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         self.db = BotDataStorage() if STORE_ORDERS else None
         self.orders = {}
 
-    def _correct_order_status_by_true_market(self, order):
+    @staticmethod
+    def _correct_order_status_by_true_market(order):
         params = {'sort': 'ASC', 'by': 'timestamp','from': order['timestamp']}
         public_trades = DEFAULT_EXCHANGE.fetch_trades('{}/{}'.format(order['symbol'], BASE_TICKER), limit=None, params=params)
         for i in public_trades:
@@ -123,7 +123,7 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         }
 
     @staticmethod
-    def fetch_ticker(self, pair):
+    def fetch_ticker(pair):
         return DEFAULT_EXCHANGE.fetch_ticker(pair)
 
     def fetch_my_trades(self, since):
