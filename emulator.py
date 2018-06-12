@@ -84,6 +84,7 @@ class MockExchange:
     def add_trade(self, trade, order): # Создание сделки
         trade['price'] = order[ 'price']
         trade['cost'] = float(trade['price']) * float(trade['amount'])
+        order['timestamp'] = trade['timestamp'] # Обновление метки времени ордера
         # trade['info']['price'] параметр оригинальной сделки trade['price'] параметр сделки эмулятора
         order['remaining'] = round(order['remaining'],14) # округление до 14 знаков после запятой
         # print('куплю',trade['amount'])
@@ -113,7 +114,7 @@ class MockExchange:
                 if trade['side'] == order['side']:
                     if float(trade['price']) >= float(order['price']):
                         # self.add_trade(trade, order) # Если проверять сделки за сутки
-                        if int(trade['timestamp']) >= int(order['timestamp']):
+                        if int(trade['timestamp']) > int(order['timestamp']):
                             self.add_trade(trade, order)
             else:
                 break
