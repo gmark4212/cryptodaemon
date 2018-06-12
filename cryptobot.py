@@ -114,15 +114,15 @@ class CryptoBot:
                         self._sell_orders.append(sell_order)
                         if self.emulated:
                             self.exchange.buy_executed_money_shift(price * buy_amount)
+                        self._buy_orders.remove(buy_order)
 
                 sleep(INTERVAL)
                 for sell_order in self._sell_orders:
                     if self.get_order_state(sell_order) == EXECUTED:
                         self.store(sell_order)
-                        self._buy_orders.remove(buy_order)
-                        self._sell_orders.remove(sell_order)
                         if self.emulated:
-                            self.exchange.sell_executed_money_shift(float(sell_order['price']) * float(sell_order['quantity']))
+                            self.exchange.sell_executed_money_shift(float(sell_order['price']) * float(sell_order['amount']))
+                        self._sell_orders.remove(sell_order)
 
     def store(self, order):
         if self.db:
