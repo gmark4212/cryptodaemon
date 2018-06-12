@@ -55,7 +55,7 @@ STOP_LIMIT = 'stopLimit'
 STOP_MARKET = 'stopMarket'
 
 # emulation
-FAKE_BALANCE = 2.10
+FAKE_BALANCE = 0.10
 
 # database
 MONGODB_PORT = 27017
