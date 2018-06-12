@@ -3,6 +3,7 @@
 
 from config import *
 
+
 class MockExchange:
     def __init__(self):
         self.orders = []

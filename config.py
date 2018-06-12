@@ -12,7 +12,7 @@ DEFAULT_HOST = '127.0.0.1'
 API_PORT = '8888'
 
 # emulation
-FAKE_DEPOSIT = 10
+FAKE_DEPOSIT = 2
 
 # dirs
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,8 +54,12 @@ MARKET = 'market'
 STOP_LIMIT = 'stopLimit'
 STOP_MARKET = 'stopMarket'
 
+# balance
+AVAILABLE = 'available'
+RESERVED = 'reserved'
+
 # emulation
-FAKE_BALANCE = 0.10
+# FAKE_BALANCE = 1
 
 # database
 MONGODB_PORT = 27017
