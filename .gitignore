@@ -3,6 +3,7 @@
 __pycache__
 env
 myvenv
+venv
 migrations
 .idea
 *~
