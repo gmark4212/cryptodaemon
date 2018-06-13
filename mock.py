@@ -13,12 +13,12 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
 
     @staticmethod
     def _correct_order_status_by_true_market(order):
-        params = {'sort': 'ASC', 'by': 'timestamp','from': order['timestamp']} #В этом нет смысла т.к по умолчанию он выдает сделки в сортировке по времени
+        params = {'sort': 'ASC', 'by': 'timestamp','from': order['timestamp']}
         public_trades = DEFAULT_EXCHANGE.fetch_trades('{}/{}'.format(order['symbol'], BASE_TICKER), limit=None, params=params)
         for i in public_trades:
             if i['side'] == order['side']:
                 if i['price'] >= order['price']:
-                    order['status'] = EXECUTED #!!!Он не смотрит количество монет!!!!
+                    order['status'] = EXECUTED
                     break
         return order
 
@@ -36,14 +36,12 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         return self.balance
 
     def fetch_order(self, oid):
-        # order = [v for v in self.orders if v['id'] == oid][0]
         order = self.orders[oid]
         if isinstance(order, dict):
             return self._correct_order_status_by_true_market(order)
 
     def create_order(self, symbol, typer, side, amount, price=None, params={}):
-        #date = self.fetch_ticker('BTC/LTC') #Подойдет любой запрос возвращающий время
-        uuid = self.uuid() #генерирует произвольный идентификатор uuid4()
+        uuid = self.uuid()
         parts = uuid.split('-')
         clientOrderId = ''.join(parts)
         clientOrderId = clientOrderId[0:32]
@@ -53,8 +51,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             'quantity': amount,
             'id': clientOrderId,
             # todo: make real datetime of creataion date!
-            'timestamp': '2018-06-12T17:40:21.912Z', #date['timestamp']
-            'createdAt': '2018-06-12T17:40:21.912Z', #date['timestamp']
+            'timestamp': '2018-06-12T17:40:21.912Z',
+            'createdAt': '2018-06-12T17:40:21.912Z',
             'datetime':  None,
             'lastTradeTimestamp': None,
             'status': NEW,
@@ -76,8 +74,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
 
     def parse_order(self, order, market=None):
         created = None
-        if 'createdAt' in order: # проверка даты создания
-            created = self.parse8601(order['createdAt']) #А смысл?
+        if 'createdAt' in order:
+            created = self.parse8601(order['createdAt'])
         updated = None
         if 'updatedAt' in order:
             updated = self.parse8601(order['updatedAt'])

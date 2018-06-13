@@ -17,6 +17,7 @@ class CryptoBot:
         self._sell_orders = []
         self.db = BotDataStorage() if STORE_ORDERS else None
         self.emulated = emulation_mode
+        self.limited_balance = 0
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
             self.exchange = FakeExchange() if emulation_mode else self.strategy.exchange
@@ -31,8 +32,7 @@ class CryptoBot:
         if base_currency_only:
             for balance in currencies_balances:
                 if balance['currency'] == BASE_TICKER:
-                    self.base_balance = balance
-                    break
+                    return balance
         else:
             return currencies_balances
 
@@ -80,7 +80,7 @@ class CryptoBot:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
                 print('ACCOUNT BALANCE: ', self.base_balance)
-                if self.base_balance[AVAILABLE] > 0:
+                if float(self.base_balance[AVAILABLE]) > 0:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
                     print('SUITABLE COINS: ', s.suitable_tickers)
@@ -89,13 +89,13 @@ class CryptoBot:
                         print('MONEY TO SPEND: ', whole_money_to_spend)
                         if whole_money_to_spend > 0:
                             self.money_per_buy_order = whole_money_to_spend/tickers_quantity
-                            print('MONEY FOR 1 ORDER: ', self.money_per_buy_order)
+                            # print('MONEY FOR 1 ORDER: ', self.money_per_buy_order)
                             for ticker in s.suitable_tickers:
                                 price = self.fetch_prices('{}/{}'.format(ticker, BASE_TICKER))
-                                print('LAST PRICE FOR {}: {} '.format(ticker, price))
+                                # print('LAST PRICE FOR {}: {} '.format(ticker, price))
                                 if price > 0:
                                     amount = round(self.money_per_buy_order/price, -3)
-                                    print('AMOUNT TO BUY {}: {} '.format(ticker, amount))
+                                    # print('AMOUNT TO BUY {}: {} '.format(ticker, amount))
                                     self._buy_orders.append(self.place_order(ticker, amount, price, BUY))
                     else:
                         print('No suitable coins for this strategy at the moment')
