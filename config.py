@@ -57,6 +57,7 @@ STOP_MARKET = 'stopMarket'
 # balance
 AVAILABLE = 'available'
 RESERVED = 'reserved'
+LIMIT = 'limit'
 
 # emulation
 # FAKE_BALANCE = 1

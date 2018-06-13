@@ -10,19 +10,18 @@ from storage import BotDataStorage
 
 class CryptoBot:
     def __init__(self, trading_strategy, emulation_mode=False):
-        self.base_balance = None
         self.money_per_buy_order = 0
         self.keep_working = True
         self._buy_orders = []
         self._sell_orders = []
         self.db = BotDataStorage() if STORE_ORDERS else None
         self.emulated = emulation_mode
-        self.limited_balance = 0
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
             self.exchange = FakeExchange() if emulation_mode else self.strategy.exchange
         else:
             raise TypeError
+        self.base_balance = self.fetch_balance()
 
     def fetch_balance(self, base_currency_only=True):
         data = self.exchange.fetch_balance()
@@ -43,9 +42,14 @@ class CryptoBot:
         return self.exchange.fetch_open_orders(self, symbol=pair)
 
     def get_summ_to_spend_to_buy(self):
+        money_to_consume = float(self.base_balance[AVAILABLE]) - float(self.base_balance[LIMIT])
+        return money_to_consume if money_to_consume > 0 else 0
+        # return available_money * ((100-self.strategy.deposit_threshold_pct)/100)
+
+    def get_funds_stop_limit(self):
         available_money = float(self.base_balance[AVAILABLE])
         if available_money > 0:
-            return available_money * ((100-self.strategy.deposit_threshold_pct)/100)
+            return available_money * (self.strategy.deposit_threshold_pct/100)
         return 0
 
     def get_order_state(self, order):
@@ -59,6 +63,8 @@ class CryptoBot:
             typer = STOP_LIMIT if side == SELL else LIMIT
             params = dict(stopPrice=price) if side == SELL else {}
             order = self.exchange.create_order(symbol, typer, side, amount, price, params)
+            print('+ NEW ORDER: ', order['side'], order['symbol'], order['price'],
+                  order['amount'], order['id'], order['datetime'])
             if self.emulated and side == BUY and isinstance(order, dict):
                 self.exchange.buy_new_money_shift(amount * price)
         return order
@@ -74,13 +80,14 @@ class CryptoBot:
 
     def start_trading(self):
         self.keep_working = True
-        print('Starting trade...')
+        self.base_balance['limit'] = self.get_funds_stop_limit()
         s = self.strategy
+        print('Starting trade...')
         if s.type == ROLLBACK:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
                 print('ACCOUNT BALANCE: ', self.base_balance)
-                if float(self.base_balance[AVAILABLE]) > 0:
+                if float(self.base_balance[AVAILABLE]) > self.base_balance['limit']:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
                     print('SUITABLE COINS: ', s.suitable_tickers)
@@ -99,8 +106,8 @@ class CryptoBot:
                                     self._buy_orders.append(self.place_order(ticker, amount, price, BUY))
                     else:
                         print('No suitable coins for this strategy at the moment')
-                else:
-                    print('You are out of funds :(')
+                # else:
+                #     print('You are out of funds ', self.base_balance)
 
                 sleep(INTERVAL)
                 for buy_order in self._buy_orders:
