@@ -40,7 +40,7 @@ class MockExchange:
 
 
     def create_order(self, symbol, typer, side, amount, price=None, params={}): # Создание ордера
-        date = self.fetch_ticker(symbol) # Запрос для получуния метки времени с биржи
+        date = self.fetch_ticker('LTC/BTC') # Запрос для получуния метки времени с биржи
         order = {
             'id': self.order_id,
             'timestamp': date['timestamp'],
