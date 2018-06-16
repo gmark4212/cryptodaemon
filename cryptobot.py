@@ -83,10 +83,13 @@ class CryptoBot:
         self.base_balance['limit'] = self.get_funds_stop_limit()
         s = self.strategy
         print('Starting trade...')
+        prebalance = None
         if s.type == ROLLBACK:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
-                print('ACCOUNT BALANCE: ', self.base_balance)
+                if self.base_balance != prebalance:
+                    prebalance = self.base_balance
+                    print('ACCOUNT BALANCE CHANGED: ', self.base_balance)
                 if float(self.base_balance[AVAILABLE]) > self.base_balance['limit']:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
@@ -113,7 +116,7 @@ class CryptoBot:
                 sleep(INTERVAL)
                 for buy_order in self._buy_orders:
                     if self.get_order_state(buy_order) == EXECUTED:
-                        self.store(buy_order)
+                        self.store_order(buy_order)
                         # check order state. sell when executed
                         price = float(buy_order['price'])
                         stop_price = price + (price * (s.your_margin_pct / 100))
@@ -127,19 +130,24 @@ class CryptoBot:
                 sleep(INTERVAL)
                 for sell_order in self._sell_orders:
                     if self.get_order_state(sell_order) == EXECUTED:
-                        self.store(sell_order)
+                        self.store_order(sell_order)
                         if self.emulated:
                             self.exchange.sell_executed_money_shift(float(sell_order['price']) * float(sell_order['amount']))
                         self._sell_orders.remove(sell_order)
 
-    def store(self, order):
+    def store_order(self, order):
         if self.db:
             self.db.store_order(order)
+
+    def store_balance_history(self, data):
+        if self.db:
+            self.db.add_history_point(data)
 
     def stop_trading(self):
         self.keep_working = False
 
 
 if __name__ == '__main__':
-    bot = CryptoBot(Strategy(), '-e' in sys.argv)
+    # bot = CryptoBot(Strategy(), '-e' in sys.argv)
+    bot = CryptoBot(Strategy(), True)
     bot.start_trading()

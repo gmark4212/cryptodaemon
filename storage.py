@@ -11,6 +11,7 @@ class BotDataStorage:
             self.client = MongoClient('{}:{}'.format(DEFAULT_HOST, MONGODB_PORT))
             self.db = self.client[MONGO_DB_NAME]
             self.orders = self.db.orders
+            self.history = self.db.history
             status = 'OK'
         except Exception as e:
             status = 'ERROR: ' + str(e)
@@ -18,8 +19,11 @@ class BotDataStorage:
 
     def store_order(self, data):
         if self.orders and isinstance(data, dict):
-            print('MONGED: {}'.format(data))
             self.orders.insert_one(data)
+
+    def add_history_point(self, data):
+        if self.history and isinstance(data, dict):
+            self.history.insert_one(data)
 
 
 class StockDataStorage:

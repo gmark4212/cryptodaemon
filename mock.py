@@ -21,11 +21,12 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             public_trades = DEFAULT_EXCHANGE.fetch_trades('{}/{}'.format(order['symbol'], BASE_TICKER), limit=None, params=params)
             for i in public_trades:
                 if i['side'] == order['side']:
+                    print('Cannot sell your {} by price {}. Stock price now: {}'.format(order['symbol'], order['price'], i['price']))
                     if i['price'] >= order['price']:
                         order['status'] = EXECUTED
                         break
-        except:
-            pass
+        except Exception as e:
+            print(e)
         return order
 
     def buy_new_money_shift(self, summ):
