@@ -6,7 +6,7 @@ from lib import *
 from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
-from storage import BotDataStorage
+from storage import BotDataStorage, Log
 
 
 class CryptoBot:
@@ -16,6 +16,7 @@ class CryptoBot:
         self._buy_orders = []
         self._sell_orders = []
         self.db = BotDataStorage() if STORE_HISTORY else None
+        # log = Log(self.db)
         self.emulated = emulation_mode
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
@@ -28,6 +29,7 @@ class CryptoBot:
             raise TypeError
         self.base_balance = self.fetch_balance()
 
+    # @log
     def fetch_balance(self, base_currency_only=True):
         data = self.exchange.fetch_balance()
         if self.emulated:
