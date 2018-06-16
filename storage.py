@@ -17,10 +17,6 @@ class BotDataStorage:
             status = 'ERROR: ' + str(e)
         print('MongoDB status... ' + status)
 
-    def store_order(self, data):
-        if self.orders and isinstance(data, dict):
-            self.orders.insert_one(data)
-
     def add_history_point(self, data):
         if self.history and isinstance(data, dict):
             self.history.insert_one(data)

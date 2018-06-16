@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from config import *
-import ntplib
-from datetime import datetime
+from lib import *
 from storage import BotDataStorage
 
 
 class FakeExchange(DEFAULT_EXCH_CLASS):
     def __init__(self):
         self.balance = dict(currency=BASE_TICKER, available=FAKE_DEPOSIT, reserved=0)
-        self.db = BotDataStorage() if STORE_ORDERS else None
+        self.db = BotDataStorage() if STORE_HISTORY else None
         self.orders = {}
         self.strategy = None
 
@@ -48,11 +47,6 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             self.balance[AVAILABLE] += summ
         print('+ GET PROFIT: ', summ)
 
-    @staticmethod
-    def utc_now():
-        x = ntplib.NTPClient()
-        return str(datetime.utcfromtimestamp(x.request('europe.pool.ntp.org').tx_time)).replace(' ', 'T')[:23]+'Z'
-
     def fetch_balance(self):
         return self.balance
 
@@ -62,7 +56,7 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             return self._correct_order_status_by_true_market(order)
 
     def create_order(self, symbol, typer, side, amount, price=None, params={}):
-        now = self.utc_now()
+        now = utc_now()
         uuid = self.uuid()
         parts = uuid.split('-')
         clientOrderId = ''.join(parts)

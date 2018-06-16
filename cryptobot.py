@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from config import *
+from lib import *
 from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
@@ -14,7 +15,7 @@ class CryptoBot:
         self.keep_working = True
         self._buy_orders = []
         self._sell_orders = []
-        self.db = BotDataStorage() if STORE_ORDERS else None
+        self.db = BotDataStorage() if STORE_HISTORY else None
         self.emulated = emulation_mode
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
@@ -22,7 +23,7 @@ class CryptoBot:
                 self.exchange = FakeExchange()
                 self.exchange.strategy = self.strategy
             else:
-                self.strategy.exchange
+                self.exchange = self.strategy.exchange
         else:
             raise TypeError
         self.base_balance = self.fetch_balance()
@@ -35,6 +36,7 @@ class CryptoBot:
         if base_currency_only:
             for balance in currencies_balances:
                 if balance['currency'] == BASE_TICKER:
+                    balance[LIMIT] = max(float(balance[AVAILABLE]) * (self.strategy.deposit_threshold_pct/100), 0)
                     return balance
         else:
             return currencies_balances
@@ -80,7 +82,7 @@ class CryptoBot:
 
     def start_trading(self):
         self.keep_working = True
-        self.base_balance['limit'] = self.get_funds_stop_limit()
+        self.base_balance[LIMIT] = self.get_funds_stop_limit()
         s = self.strategy
         print('Starting trade...')
         prebalance = None
@@ -90,7 +92,8 @@ class CryptoBot:
                 if self.base_balance != prebalance:
                     prebalance = self.base_balance
                     print('ACCOUNT BALANCE CHANGED: ', self.base_balance)
-                if float(self.base_balance[AVAILABLE]) > self.base_balance['limit']:
+
+                if float(self.base_balance[AVAILABLE]) > self.base_balance[LIMIT]:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
                     print('SUITABLE COINS: ', s.suitable_tickers)
@@ -116,7 +119,6 @@ class CryptoBot:
                 sleep(INTERVAL)
                 for buy_order in self._buy_orders:
                     if self.get_order_state(buy_order) == EXECUTED:
-                        self.store_order(buy_order)
                         # check order state. sell when executed
                         price = float(buy_order['price'])
                         stop_price = price + (price * (s.your_margin_pct / 100))
@@ -125,23 +127,20 @@ class CryptoBot:
                         self._sell_orders.append(sell_order)
                         if self.emulated:
                             self.exchange.buy_executed_money_shift(price * buy_amount)
+                        self.store_history(buy_order)
                         self._buy_orders.remove(buy_order)
 
                 sleep(INTERVAL)
                 for sell_order in self._sell_orders:
                     if self.get_order_state(sell_order) == EXECUTED:
-                        self.store_order(sell_order)
                         if self.emulated:
                             self.exchange.sell_executed_money_shift(float(sell_order['price']) * float(sell_order['amount']))
+                        self.store_history(sell_order)
                         self._sell_orders.remove(sell_order)
 
-    def store_order(self, order):
+    def store_history(self, order):
         if self.db:
-            self.db.store_order(order)
-
-    def store_balance_history(self, data):
-        if self.db:
-            self.db.add_history_point(data)
+            self.db.add_history_point(dict(utc=utc_now(), balance=self.base_balance, order=order))
 
     def stop_trading(self):
         self.keep_working = False

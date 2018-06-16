@@ -6,7 +6,7 @@ from ccxt import hitbtc2
 
 # general
 APP_NAME = 'CryptoDaemonBot'
-APP_VERSION = '0.2'
+APP_VERSION = '0.3'
 INTERVAL = 6
 DEFAULT_HOST = '127.0.0.1'
 API_PORT = '8888'
@@ -70,7 +70,7 @@ LIMIT = 'limit'
 # database
 MONGODB_PORT = 27017
 MONGO_DB_NAME = 'cryptodaemon'
-STORE_ORDERS = False
+STORE_HISTORY = True
 
 # telegram
 TOKEN = '567981171:AAE0yeFOkKUqGs00SILkFDrbP8m8wcCqIcs'
