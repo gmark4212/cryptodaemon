@@ -77,5 +77,6 @@ TOKEN = '567981171:AAE0yeFOkKUqGs00SILkFDrbP8m8wcCqIcs'
 COMMANDS = {
             'help': 'Предоставляет информацию о доступных командах',
             'run': 'Запускает CryptoBot',
-            'stop': 'Останавливает CryptoBot'
-            }
+            'stop': 'Останавливает CryptoBot',
+            'balance': 'Предоставляет информацию о текущем балансе'
+}
