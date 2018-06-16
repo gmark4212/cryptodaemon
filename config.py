@@ -71,3 +71,11 @@ LIMIT = 'limit'
 MONGODB_PORT = 27017
 MONGO_DB_NAME = 'cryptodaemon'
 STORE_ORDERS = False
+
+# telegram
+TOKEN = '567981171:AAE0yeFOkKUqGs00SILkFDrbP8m8wcCqIcs'
+COMMANDS = {
+            'help': 'Предоставляет информацию о доступных командах',
+            'run': 'Запускает CryptoBot',
+            'stop': 'Останавливает CryptoBot'
+            }
