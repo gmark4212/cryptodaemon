@@ -91,9 +91,7 @@ class CryptoBot:
         if s.type == ROLLBACK:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
-                if self.base_balance != prebalance:
-                    prebalance = self.base_balance
-                    print('ACCOUNT BALANCE CHANGED: ', self.base_balance)
+                print('ACCOUNT BALANCE: ', self.base_balance)
                 if float(self.base_balance[AVAILABLE]) > self.base_balance[LIMIT]:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
@@ -105,13 +103,14 @@ class CryptoBot:
                             self.money_per_buy_order = whole_money_to_spend/tickers_quantity
                             print('MONEY FOR 1 ORDER: ', self.money_per_buy_order)
                             for ticker in s.suitable_tickers:
-                                price = self.fetch_prices('{}/{}'.format(ticker, BASE_TICKER))
-                                print('LAST PRICE FOR {}: {} '.format(ticker, price))
+                                symbol = '{}/{}'.format(ticker, BASE_TICKER)
+                                price = self.fetch_prices(symbol)
+                                print('LAST PRICE FOR {}: {} '.format(symbol, price))
                                 if price > 0:
                                     amount = self.money_per_buy_order/price
                                     if amount > 0:
-                                        print('AMOUNT TO BUY {}: {} '.format(ticker, amount))
-                                        self._buy_orders.append(self.place_order(ticker, amount, price, BUY))
+                                        print('AMOUNT TO BUY {}: {} '.format(symbol, amount))
+                                        self._buy_orders.append(self.place_order(symbol, amount, price, BUY))
                     else:
                         print('No suitable coins for this strategy at the moment')
                 # else:
