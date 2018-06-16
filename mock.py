@@ -14,7 +14,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
     def _correct_order_status_by_true_market(order):
         params = {'sort': 'ASC', 'by': 'timestamp','from': order['timestamp']}
         try:
-            public_trades = DEFAULT_EXCHANGE.fetch_trades('{}/{}'.format(order['symbol'], BASE_TICKER), limit=None, params=params)
+            public_trades = DEFAULT_EXCHANGE.fetch_trades(order['symbol'], limit=None, params=params)
+            print(public_trades)
             for i in public_trades:
                 if i['side'] == order['side']:
                     print(order['symbol'],order['datetime'], order['price'], i['price'])
