@@ -94,7 +94,6 @@ class CryptoBot:
                 if self.base_balance != prebalance:
                     prebalance = self.base_balance
                     print('ACCOUNT BALANCE CHANGED: ', self.base_balance)
-
                 if float(self.base_balance[AVAILABLE]) > self.base_balance[LIMIT]:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
@@ -142,7 +141,7 @@ class CryptoBot:
 
     def store_history(self, order):
         if self.db:
-            self.db.add_history_point(dict(utc=utc_now(), balance=self.base_balance, order=order))
+            self.db.add_history_point(dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
 
     def stop_trading(self):
         self.keep_working = False

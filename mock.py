@@ -15,9 +15,9 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         params = {'sort': 'ASC', 'by': 'timestamp','from': order['timestamp']}
         try:
             public_trades = DEFAULT_EXCHANGE.fetch_trades('{}/{}'.format(order['symbol'], BASE_TICKER), limit=None, params=params)
-            print(order['timestamp'], order['datetime'])
             for i in public_trades:
                 if i['side'] == order['side']:
+                    print(order['symbol'],order['datetime'], order['price'], i['price'])
                     if i['price'] >= order['price']:
                         order['status'] = EXECUTED
                         break
@@ -37,9 +37,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             self.balance[AVAILABLE] += summ
             self.balance[LIMIT] += summ
         elif self.strategy == HALF_REINVEST:
-            half = summ/2
-            self.balance[AVAILABLE] += half
-            self.balance[LIMIT] += half
+            self.balance[AVAILABLE] += summ
+            self.balance[LIMIT] += summ/2
         elif self.strategy == FULL_REINVEST:
             self.balance[AVAILABLE] += summ
         print('+ GET PROFIT: ', summ)
