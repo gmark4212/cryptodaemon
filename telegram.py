@@ -90,13 +90,14 @@ if __name__ == '__main__':
     @bot.message_handler(func=lambda message: True)
     def stop_cryptobot(message):
         if message.text == '/stop' or message.text == 'Остановить CryptoBot':
-            cryptobot.stop_trading()
+            bot.cryptobot.stop_trading()
             bot.send_message(message.chat.id, 'CryptoBot остановлен', reply_markup=hidden_keyboard)
 
 
+    @bot.message_handler(commands=['balance'])
     @bot.message_handler(func=lambda message: True)
     def balance(message):
-        if message.text == 'Текущий баланс':
+        if message.text == '/balance' or message.text == 'Текущий баланс':
             fetch_balance = bot.cryptobot.fetch_balance()
             bot.send_message(message.chat.id, 'Ваш баланс: {}'.format(fetch_balance), reply_markup=keyboard)
 
