@@ -36,7 +36,7 @@ class CryptoBot:
         if base_currency_only:
             for balance in currencies_balances:
                 if balance['currency'] == BASE_TICKER:
-                    balance[LIMIT] = max(float(balance[AVAILABLE]) * (self.strategy.deposit_threshold_pct/100), 0)
+                    balance[LIMIT] = self.get_limit_deposit(float(balance[AVAILABLE]))
                     return balance
         else:
             return currencies_balances
@@ -50,9 +50,11 @@ class CryptoBot:
     def get_summ_to_spend_to_buy(self):
         return max(float(self.base_balance[AVAILABLE]) - float(self.base_balance[LIMIT]), 0)
 
+    def get_limit_deposit(self, available_money):
+        return max(available_money * (self.strategy.deposit_threshold_pct / 100), 0)
+
     def get_funds_stop_limit(self):
-        available_money = float(self.base_balance[AVAILABLE])
-        return max(available_money * (self.strategy.deposit_threshold_pct/100), 0)
+        return self.get_limit_deposit(float(self.base_balance[AVAILABLE]))
 
     def get_order_state(self, order):
         if isinstance(order, dict):

@@ -1,15 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 from config import *
 from lib import *
-from storage import BotDataStorage
 
 
 class FakeExchange(DEFAULT_EXCH_CLASS):
     def __init__(self):
         self.balance = dict(currency=BASE_TICKER, available=FAKE_DEPOSIT, reserved=0)
-        self.db = BotDataStorage() if STORE_HISTORY else None
         self.orders = {}
         self.strategy = None
 
@@ -18,9 +15,9 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         params = {'sort': 'ASC', 'by': 'timestamp','from': order['timestamp']}
         try:
             public_trades = DEFAULT_EXCHANGE.fetch_trades('{}/{}'.format(order['symbol'], BASE_TICKER), limit=None, params=params)
+            print(order['timestamp'], order['datetime'])
             for i in public_trades:
                 if i['side'] == order['side']:
-                    print('Cannot sell your {} by price {}. Stock price now: {}'.format(order['symbol'], order['price'], i['price']))
                     if i['price'] >= order['price']:
                         order['status'] = EXECUTED
                         break

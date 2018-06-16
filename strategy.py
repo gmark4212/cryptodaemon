@@ -12,7 +12,7 @@ class Strategy:
         self.purchase_different_coins = 4  # 3-10 recommended
         self.drop_range_to_buy_pct = range(-40, -10)
         self.deposit_threshold_pct = 50
-        self.capitalization_threshold_usd = float(200000000.0)  # > 30 billions recommended
+        self.capitalization_threshold_usd = float(2000000.0)  # > 30 billions recommended
         self.market_volume_threshold_usd_24h = 500000
         self.your_margin_pct = 10
         self.market = Market()
