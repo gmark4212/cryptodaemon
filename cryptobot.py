@@ -148,6 +148,5 @@ class CryptoBot:
 
 
 if __name__ == '__main__':
-    # bot = CryptoBot(Strategy(), '-e' in sys.argv)
-    bot = CryptoBot(Strategy(), True)
+    bot = CryptoBot(Strategy(), '-e' in sys.argv)
     bot.start_trading()
