@@ -12,6 +12,7 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         self.balance = dict(currency=BASE_TICKER, available=FAKE_DEPOSIT, reserved=0)
         self.db = BotDataStorage() if STORE_ORDERS else None
         self.orders = {}
+        self.strategy = None
 
     @staticmethod
     def _correct_order_status_by_true_market(order):
@@ -35,8 +36,16 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         self.balance[RESERVED] -= summ
 
     def sell_executed_money_shift(self, summ):
-        self.balance[AVAILABLE] += summ
-        print('+ INCOME: ', summ)
+        if self.strategy == FULL_TAKE:
+            self.balance[AVAILABLE] += summ
+            self.balance[LIMIT] += summ
+        elif self.strategy == HALF_REINVEST:
+            half = summ/2
+            self.balance[AVAILABLE] += half
+            self.balance[LIMIT] += half
+        elif self.strategy == FULL_REINVEST:
+            self.balance[AVAILABLE] += summ
+        print('+ GET PROFIT: ', summ)
 
     @staticmethod
     def utc_now():

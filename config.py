@@ -29,6 +29,11 @@ DEFAULT_EXCHANGE = hitbtc2({
 
 DEFAULT_EXCH_CLASS = DEFAULT_EXCHANGE.__class__
 
+# profit policies
+FULL_REINVEST = 'full-reinvest'
+HALF_REINVEST = 'half-reinvest'
+FULL_TAKE = 'full-take'
+
 # currency
 BASE_TICKER = 'BTC'
 USD = 'USD'

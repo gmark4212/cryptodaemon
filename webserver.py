@@ -8,7 +8,8 @@ from bottle import run, request, route
 
 @route('/<path>', method='POST')
 def process(path):
-    params = request.POST.dict
+    incoming = request.POST.dict
+    print(incoming)
     # return subprocess.check_output(['python3', path+'.py'],shell=True)
 
 

@@ -22,6 +22,7 @@ class Strategy:
         self.coins_listing = {item['symbol']: {'id': item['id'], 'name': item['name']} for item in self.market.listings()['data']}
         self.crypto_only = False  # include tokens, ico etc.
         self.currencies = None
+        self.profit_policy = HALF_REINVEST
         for key in kwargs:
             if hasattr(self, key):
                 self[key] = kwargs[key]
@@ -36,7 +37,10 @@ class Strategy:
 
     def fetch_suitable_coins(self):
         self.fetch_currencies()
-        tickers = self.exchange.fetch_tickers()
+        try:
+            tickers = self.exchange.fetch_tickers()
+        except:
+            tickers = {}
         self.drops = {pair: data for pair, data in tickers.items()
                       if pair.endswith(BASE_TICKER)
                       and data['percentage'] is not None
@@ -52,7 +56,7 @@ class Strategy:
                         capital = market_data['market_cap']
                         if isinstance(capital, float):
                             if capital >= self.capitalization_threshold_usd:
-                                    print(ticker, capital)
+                                    print(ticker, self.coins_listing[ticker]['name'], capital)
                                     self.suitable_coins_marketcap[ticker] = capital
                 else:
                     print('Capitalization is unknown: {}... pass'.format(ticker))
