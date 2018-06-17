@@ -73,7 +73,7 @@ MONGO_DB_NAME = 'cryptodaemon'
 STORE_HISTORY = True
 
 # telegram
-TOKEN = '567981171:AAE0yeFOkKUqGs00SILkFDrbP8m8wcCqIcs'
+TOKEN = '602258813:AAHBxMU8FfXHRo4mD3ZyyLobgHdvO8yUWtU'
 COMMANDS = {
             'help': 'Предоставляет информацию о доступных командах',
             'run': 'Запускает CryptoBot',
