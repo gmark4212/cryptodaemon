@@ -36,26 +36,28 @@ if __name__ == '__main__':
         text = message.text
         if chatId not in bot.users:
             bot.send_message(chatId, "Hello! I am Bot. What is you name?")
-            bot.register_next_step_handler(message, process_API_step)
+            bot.register_next_step_handler(message, process_KEY_step)
         else:
             bot.send_message(chatId, "Welcome, {}!".format(text), reply_markup=keyboard)
 
-    def process_API_step(message):
+    def process_KEY_step(message):
         chatId = message.chat.id
         name = message.text
         bot.users[chatId] = name
-        bot.send_message(chatId, 'API: ')
+        bot.send_message(chatId, 'SECRET KEY: ')
         bot.register_next_step_handler(message, process_SECRET_step)
+
 
     def process_SECRET_step(message):
         chatId = message.chat.id
-        API = message.text
-        if API == 'api':
-            bot.send_message(chatId, 'SECRET KEY: ')
-            bot.register_next_step_handler(message, process_last_step)
+        SECRET = message.text
+        if SECRET == 'secret':
+            bot.send_message(chatId, "Welcome, {}!".format(bot.users[chatId]))
+            command_help(message)
         else:
-            bot.send_message(chatId, 'API:')
-            bot.register_next_step_handler(message, process_API_step)
+            bot.send_message(chatId, 'SECRET KEY: ')
+            bot.register_next_step_handler(message, process_SECRET_step)
+
 
     def process_last_step(message):
         chatId = message.chat.id
