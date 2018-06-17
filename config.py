@@ -8,8 +8,9 @@ from ccxt import hitbtc2
 APP_NAME = 'CryptoDaemonBot'
 APP_VERSION = '0.3'
 INTERVAL = 6
-DEFAULT_HOST = '127.0.0.1'
-API_PORT = '8888'
+DEFAULT_HOST = 'localhost'
+API_PORT = 8888
+ENCODING = 'utf-8'
 
 # emulation
 FAKE_DEPOSIT = 2

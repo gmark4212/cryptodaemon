@@ -134,8 +134,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         } 
 
     @staticmethod
-    def fetch_ticker(pair):
-        return DEFAULT_EXCHANGE.fetch_ticker(pair)
+    def fetch_ticker(symbol):
+        return DEFAULT_EXCHANGE.fetch_ticker(symbol)
 
     def fetch_my_trades(self, since):
         pass
