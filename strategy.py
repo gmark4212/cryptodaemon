@@ -25,7 +25,7 @@ class Strategy:
         self.profit_policy = HALF_REINVEST
         for key in kwargs:
             if hasattr(self, key):
-                self[key] = kwargs[key]
+                setattr(self, key, kwargs[key])
 
     def fetch_currencies(self):
         curs = self.exchange.fetch_currencies()

@@ -7,6 +7,7 @@ from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
 from storage import BotDataStorage
+import json
 
 
 class CryptoBot:
