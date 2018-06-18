@@ -1,7 +1,7 @@
 import telebot
 from telebot.types import Message
 import time
-from config_telebot import *
+from conf_telebot import *
 
 
 bot = telebot.TeleBot(TOKEN)
