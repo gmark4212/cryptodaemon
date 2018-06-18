@@ -18,12 +18,14 @@ class PostHandler(BaseHTTPRequestHandler):
         self.process_query(data)
 
     def process_query(self, data):
-        if 'request-type' in data:
-            if data['request-type'] == 'cryptobot-start':
+        if 'action' in data:
+            if data['action'] == 'start':
                 strategy_settings = data['strategy-settings']
                 cb = CryptoBot(Strategy(None, **strategy_settings), True)
                 p = Process(target=cb.start_trading)
                 p.start()
+                self.respond('OK')
+            elif data['action'] == 'stop':
                 self.respond('OK')
 
     def respond(self, answer):
