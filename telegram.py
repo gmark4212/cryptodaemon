@@ -3,6 +3,8 @@
 
 import sys
 import telebot
+from aiogram.utils.markdown import text, bold, italic, code, pre
+from aiogram.types import ParseMode
 from telebot import TeleBot, types
 from cryptobot import CryptoBot
 from strategy import Strategy
@@ -37,7 +39,7 @@ if __name__ == '__main__':
             # иначе
         else:
             # приветствует
-            bot.send_message(chatId, "Welcome, {}!".format(text))
+            bot.send_message(chatId, f"Welcome, {text}!")
 
     def process_NAME_step(message):
         "запрашивает секретный ключ"
@@ -56,7 +58,7 @@ if __name__ == '__main__':
         #если все гуд
         if SECRET == 'secret':
             # приветствует и предоставляет информацию от командах
-            bot.send_message(chatId, "Welcome, {}!".format(bot.users[chatId]))
+            bot.send_message(chatId, f"Welcome, {bot.users[chatId]}!")
             command_help(message)
         else:
             # в случае неправильного ввода опять запрашивает ключ
@@ -66,12 +68,13 @@ if __name__ == '__main__':
 
     @bot.message_handler(commands=['help'])
     def command_help(message):
-        "выводит сообщение о доступных коммандах и что они могут"
-        cid = message.chat.id
-        help_text =  " Доступны следующие команды: \n"
-        for key in COMMANDS:
-            help_text += "/" + key + ": " + COMMANDS[key] + "\n"
-            bot.send_message(cid, help_text)
+        chatId = message.chat.id
+        msg = text(bold('Доступны следующие команды: \n'),
+                   '/help - Предоставляет информацию о доступных командах\n',
+                   '/run - Запускает CryptoBot\n',
+                   '/stop - Останавливает CryptoBot\n',
+                   '/balance - Предоставляет информацию о текущем балансе')
+        bot.send_message(chatId, msg, parse_mode=ParseMode.MARKDOWN)
 
 
     @bot.message_handler(commands=['run'])
@@ -95,7 +98,7 @@ if __name__ == '__main__':
     def balance(message):
         "выводит информацию о текущем балансе"
         fetch_balance = bot.cryptobot.fetch_balance()
-        bot.send_message(message.chat.id, 'Ваш баланс: {}'.format(fetch_balance))
+        bot.send_message(message.chat.id, f'Ваш баланс: {fetch_balance}')
 
 
     bot.polling(none_stop=True)
