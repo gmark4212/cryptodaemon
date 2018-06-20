@@ -53,6 +53,7 @@ PARTIAL = 'partiallyFilled'
 EXECUTED = 'filled'
 CANCELED = 'canceled'
 EXPIRED = 'expired'
+OPEN = 'open'
 
 # order types
 LIMIT = 'limit'

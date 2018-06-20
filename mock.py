@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from config import *
 from lib import *
+from storage import BotDataStorage
 
 
 class FakeExchange(DEFAULT_EXCH_CLASS):
@@ -9,6 +10,7 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
         self.balance = dict(currency=BASE_TICKER, available=FAKE_DEPOSIT, reserved=0)
         self.orders = {}
         self.strategy = None
+        self.db = BotDataStorage() if STORE_HISTORY else None
 
     @staticmethod
     def _correct_order_status_by_true_market(order):
@@ -21,6 +23,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
                     print(order['symbol'],order['datetime'], order['price'], i['price'])
                     if i['price'] >= order['price']:
                         order['status'] = EXECUTED
+                        if FakeExchange.db:
+                            FakeExchange.db.add_order(order)
                         break
         except Exception as e:
             print(e)
@@ -80,6 +84,8 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             'info': None,
         }
         order = self.parse_order(response)
+        if self.db:
+            self.db.add_order(order)
         id = order['id']
         self.orders[id] = order
         return order
