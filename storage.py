@@ -22,7 +22,7 @@ class BotDataStorage:
 
     def get_entries(self, collection_name=None):
         if bool(collection_name) and hasattr(self, collection_name):
-            return [i for i in self[collection_name].find()]
+            return [i for i in getattr(self, collection_name).find()]
 
     def add_entry(self, collection_name=None, data=None):
         if bool(collection_name) and hasattr(self, collection_name) and isinstance(data, dict):
