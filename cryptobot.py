@@ -139,7 +139,7 @@ class CryptoBot:
 
     def store_history(self, order):
         if self.db:
-            self.db.add_entry(HISTORY, self.db.add_history_point(dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order)))
+            self.db.add_entry(HISTORY, dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
 
     def stop_trading(self):
         self.keep_working = False
