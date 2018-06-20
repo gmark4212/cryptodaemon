@@ -36,9 +36,9 @@ class BotDataStorage:
 
     def add_order(self, order):
         if isinstance(order, dict):
-            order['time'] = ctime()
-            if order['status'] == EXECUDET:
-                order['datetime'] = utc_now()
+            # order['time'] = ctime()
+            # if order['status'] == EXECUDET:
+            #     order['datetime'] = utc_now()
             self.orders.insert_one(order)
 
     def get_orders(self, symbol=None, status=None, side=None):
