@@ -23,19 +23,34 @@ class BotDataStorage:
         print('MongoDB status... ' + status)
 
     def add_history_point(self, data):
-        if self.history and isinstance(data, dict):
+        if isinstance(data, dict):
             self.history.insert_one(data)
 
+    def get_stories(self):
+        stories = []
+        for story in self.history.find():
+            stories.append(story)
+        return stories
+
+    def add_order(self, order):
+        if isinstance(order, dict):
+            self.orders.insert_one(order)
+
+    def get_orders(self, symbol=None):
+        orders = []
+        for order in self.orders.find(symbol):
+            orders.append(order)
+        return orders
+
     def add_log_info(self, info):
-        if self.logs and isinstance(info, dict):
+        if isinstance(info, dict):
             self.logs.insert_one(info)
 
     def get_logs(self):
-        if self.db.logs:
-            logs = []
-            for log in self.db.logs.find():
-                logs.append(log)
-            return logs
+        logs = []
+        for log in self.db.logs.find():
+            logs.append(log)
+        return logs
 
 
 class Log:
@@ -44,13 +59,13 @@ class Log:
 
     @staticmethod
     def _create_message(result=None, *args, **kwargs):
-        info = ''
+        info = {}
         if args:
-            info += 'args: {} '.format(args)
+            info['args'] = args
         if kwargs:
-            info += 'kwargs: {} '.format(kwargs)
+            info['kwargs'] = kwargs
         if result:
-            info += '= {}'.format(result)
+            info['result'] = result
         return info
 
     def __call__(self, func):
@@ -64,3 +79,6 @@ class Log:
                 return result
             return decorated
         return func
+
+
+
