@@ -7,7 +7,6 @@ from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
 from storage import BotDataStorage
-import json
 
 
 class CryptoBot:
@@ -88,7 +87,6 @@ class CryptoBot:
         self.base_balance[LIMIT] = self.get_funds_stop_limit()
         s = self.strategy
         print('Starting trade...')
-        prebalance = None
         if s.type == ROLLBACK:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
@@ -141,7 +139,7 @@ class CryptoBot:
 
     def store_history(self, order):
         if self.db:
-            self.db.add_history_point(dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
+            self.db.add_entry(HISTORY, self.db.add_history_point(dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order)))
 
     def stop_trading(self):
         self.keep_working = False

@@ -1,11 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 from config import *
 from pymongo import MongoClient
-
 from functools import wraps
-
 from time import ctime
 
 
@@ -17,40 +14,19 @@ class BotDataStorage:
             self.orders = self.db.orders
             self.history = self.db.history
             self.logs = self.db.logs
+            self.workers = self.db.workers
             status = 'OK'
         except Exception as e:
             status = 'ERROR: ' + str(e)
         print('MongoDB status... ' + status)
 
-    def add_history_point(self, data):
-        if isinstance(data, dict):
-            self.history.insert_one(data)
+    def get_entries(self, collection_name=None):
+        if bool(collection_name) and hasattr(self, collection_name):
+            return [i for i in self[collection_name].find()]
 
-    def get_stories(self):
-        stories = []
-        for story in self.history.find():
-            stories.append(story)
-        return stories
-
-    def add_order(self, order):
-        if isinstance(order, dict):
-            self.orders.insert_one(order)
-
-    def get_orders(self, symbol=None):
-        orders = []
-        for order in self.orders.find(symbol):
-            orders.append(order)
-        return orders
-
-    def add_log_info(self, info):
-        if isinstance(info, dict):
-            self.logs.insert_one(info)
-
-    def get_logs(self):
-        logs = []
-        for log in self.db.logs.find():
-            logs.append(log)
-        return logs
+    def add_entry(self, collection_name=None, data=None):
+        if bool(collection_name) and hasattr(self, collection_name) and isinstance(data, dict):
+            getattr(self, collection_name).insert_one(data)
 
 
 class Log:
@@ -79,6 +55,3 @@ class Log:
                 return result
             return decorated
         return func
-
-
-

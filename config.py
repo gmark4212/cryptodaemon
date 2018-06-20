@@ -8,7 +8,7 @@ from ccxt import hitbtc2
 APP_NAME = 'CryptoDaemonBot'
 APP_VERSION = '0.3'
 INTERVAL = 6
-DEFAULT_HOST = 'localhost'
+DEFAULT_HOST = '127.0.0.1'
 API_PORT = 8888
 ENCODING = 'utf-8'
 
@@ -65,13 +65,16 @@ AVAILABLE = 'available'
 RESERVED = 'reserved'
 LIMIT = 'limit'
 
-# emulation
-# FAKE_BALANCE = 1
-
 # database
 MONGODB_PORT = 27017
 MONGO_DB_NAME = 'cryptodaemon'
 STORE_HISTORY = True
+
+# collections
+HISTORY = 'history'
+ORDERS = 'orders'
+WORKERS = 'workers'
+LOGS = 'logs'
 
 # telegram
 TOKEN = '602258813:AAHBxMU8FfXHRo4mD3ZyyLobgHdvO8yUWtU'
@@ -81,3 +84,8 @@ COMMANDS = {
             'stop': 'Останавливает CryptoBot',
             'balance': 'Предоставляет информацию о текущем балансе'
 }
+
+# API codes
+SUCCESS = 200
+SERVER_ERROR = 500
+WRONG_DATA = 400
