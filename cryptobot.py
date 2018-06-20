@@ -6,7 +6,7 @@ from lib import *
 from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
-from storage import BotDataStorage
+from storage import BotDataStorage, logger
 import json
 
 
@@ -74,6 +74,7 @@ class CryptoBot:
                 self.exchange.buy_new_money_shift(amount * price)
         return order
 
+    @logger
     def calculate_profit(self, since):
         balance = {SELL: 0, BUY: 0}
         trades = self.exchange.fetch_my_trades(since=since)
@@ -83,6 +84,7 @@ class CryptoBot:
             balance[side] += trade_summ
         return balance[SELL] - balance[BUY]
 
+    @logger
     def start_trading(self):
         self.keep_working = True
         self.base_balance[LIMIT] = self.get_funds_stop_limit()
@@ -143,6 +145,7 @@ class CryptoBot:
         if self.db:
             self.db.add_history_point(dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
 
+    @logger
     def stop_trading(self):
         self.keep_working = False
 
