@@ -18,7 +18,7 @@ class ProcessManager:
         if self.request_is_valid(data) and self.find_worker(data['id']) is None:
             ss = 'strategy-settings'
             strategy_settings = data[ss] if ss in data else {}
-            cb = CryptoBot(Strategy(None, **strategy_settings), True)
+            cb = CryptoBot(Strategy(data['exchange'], **strategy_settings), True)
             stream = Process(target=cb.start_trading)
             try:
                 # stream.daemon = True
@@ -40,16 +40,14 @@ class ProcessManager:
 
     def kill_worker(self, uid):
         # todo: not stop!
-        worker = self.find_worker(uid)
-        if worker:
-            try:
-                worker.terminate()
-                self.workers.remove(worker)
-                print(worker, ' killed')
-            except:
-                return False
-            else:
-                return True
+        try:
+            self.workers[uid].terminate()
+            self.workers.remove(self.workers[uid])
+            print(' killed!')
+        except:
+            return False
+        else:
+            return True
 
 
 class PostHandler(BaseHTTPRequestHandler):
@@ -63,11 +61,26 @@ class PostHandler(BaseHTTPRequestHandler):
         data = json.loads(body.decode(ENCODING))
         self.process_query(data)
 
+    @staticmethod
+    def keys_structured(api_key, secret_key):
+        return dict(apiKey=api_key, secret=secret_key, enableRateLimit=True)
+
     def process_query(self, data):
+        print(data)
         if 'action' in data:
-            uid = data['id']
-            # todo: set exchange by name + api key
+            # set exchange by name + api key
             if data['action'] == 'start':
+                if 'exchange' in data and 'public_key' in data and 'secret_key' in data:
+                    ex = SUPPORTED_EXCHANGES[data['exchange']]
+                    if ex is None:
+                        self.respond(WRONG_DATA, 'Non supported exchange!')
+                        return False
+                    else:
+                        data['exchange'] = ex(self.keys_structured(data['public_key'], data['secret_key']))
+                else:
+                    self.respond(WRONG_DATA, 'Exchange or API-key unfilled!')
+                    return False
+
                 started = self.pm.add_worker(data)
                 print(self.pm.workers)
                 if started is None:
@@ -77,7 +90,7 @@ class PostHandler(BaseHTTPRequestHandler):
                 else:
                     self.respond(SERVER_ERROR, 'Shit happened. ')
             elif data['action'] == 'stop':
-                if self.pm.kill_worker(uid):
+                if self.pm.kill_worker(data['id']):
                     self.respond(SUCCESS, 'CryptoDaemon instance stopped')
                 else:
                     self.respond(SERVER_ERROR, 'Your bot is unstoppable!')
@@ -95,6 +108,3 @@ class PostHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     httpd = HTTPServer((DEFAULT_HOST, API_PORT), PostHandler)
     httpd.serve_forever()
-
-
-
