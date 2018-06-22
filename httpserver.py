@@ -24,7 +24,7 @@ class ProcessManager:
             try:
                 # stream.daemon = True
                 stream.start()
-                self.workers[data['id']] = dict(process=stream, bot=self.cb)
+                self.workers[data['id']] = dict(process=stream, bot=cb)
                 print(self.workers)
                 return True
             except Exception as e:
@@ -51,11 +51,10 @@ class ProcessManager:
                 self.workers[uid]['process'].terminate()
                 self.workers.remove(self.workers[uid])
                 print(' killed!')
+                return True
             except Exception as e:
                 print(e)
                 return False
-            else:
-                return True
 
 
 class PostHandler(BaseHTTPRequestHandler):
@@ -107,7 +106,7 @@ class PostHandler(BaseHTTPRequestHandler):
                     self.respond(SUCCESS, 'CryptoDaemon instance stopped')
                 else:
                     self.respond(SERVER_ERROR, 'Your bot is unstoppable!')
-            elif act == 'get-workers':
+            elif act == 'get-alive-workers':
                 self.respond(SUCCESS, str(self.pm.get_alive_workers()))
             else:
                 self.respond(WRONG_DATA, 'Unknown action!')
