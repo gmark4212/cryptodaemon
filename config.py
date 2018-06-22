@@ -70,7 +70,7 @@ LIMIT = 'limit'
 # database
 MONGODB_PORT = 27017
 MONGO_DB_NAME = 'cryptodaemon'
-STORE_HISTORY = True
+STORE_HISTORY = False
 
 # collections
 HISTORY = 'history'
@@ -91,3 +91,10 @@ COMMANDS = {
 SUCCESS = 200
 SERVER_ERROR = 500
 WRONG_DATA = 400
+
+# request keys
+AK = 'api_keys'
+ACTION = 'action'
+PK = 'public_key'
+SK = 'secret_key'
+EXCHANGE = 'exchange'

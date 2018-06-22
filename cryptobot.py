@@ -144,6 +144,9 @@ class CryptoBot:
     def stop_trading(self):
         self.keep_working = False
 
+    def __del__(self):
+        print('Daemon killed...')
+
 
 if __name__ == '__main__':
     bot = CryptoBot(Strategy(), '-e' in sys.argv)
