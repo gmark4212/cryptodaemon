@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import requests
 import telebot
 from aiogram.utils.markdown import text, bold, italic, code, pre
 from aiogram.types import ParseMode
@@ -11,13 +12,15 @@ from strategy import Strategy
 from storage import *
 from config import *
 
-
 bot = TeleBot(TOKEN)
 users = {}
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start'], content_types='text')
 def command_start(message):
+    # Отправляет на веб-сервер POST запрос
+    data = {'id': message.chat.id, 'action': message.text}
+    requests.post('http://httpbin.org/post', json.dumps(data))
     if chatId not in users:
         # спрашивает имя и отправляет на следующий этап регистрации - секретный ключ
         bot.send_message(message.chat.id, "Hello! I am Bot.\nWhat is you name?")
@@ -52,9 +55,11 @@ def process_SECRET_step(message):
 @bot.message_handler(commands=['help'])
 def command_help(message):
     msg = text(bold('Доступны следующие команды: \n'),
+               '/start - при запуске ТелеграмБота необходимо\n ввести свое имя и секретный ключ\n',
                '/help - Предоставляет информацию о доступных командах\n',
-               '/run - Запускает CryptoBot\n', '/stop - Останавливает CryptoBot\n',
-               '/balance - Предоставляет информацию о текущем балансе')
+               '/run - Запускает CryptoBot\n',
+               '/balance - Предоставляет информацию о текущем балансе\n',
+               '/stop - Останавливает CryptoBot')
     bot.send_message(message.chat.id, msg, parse_mode=ParseMode.MARKDOWN)
 
 @bot.message_handler(commands=['run'])
@@ -90,6 +95,8 @@ def stop_cryptobot(message):
         pass
     else:
         bot.send_message(message.chat.id, 'CryptoBot остановлен')
+        data = {'id': message.chat.id, 'action': message.text}
+        requests.post('http://httpbin.org/post', json.dumps(data))
 
 
 
