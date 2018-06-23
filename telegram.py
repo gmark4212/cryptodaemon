@@ -12,57 +12,50 @@ from storage import *
 from config import *
 
 
-bot = TelegramBot(TOKEN)
+bot = TeleBot(TOKEN)
 users = {}
 
 
 @bot.message_handler(commands=['start'])
 def command_start(message):
-    chatId = message.chat.id
-    text = message.text
     if chatId not in users:
         # спрашивает имя и отправляет на следующий этап регистрации - секретный ключ
-        bot.send_message(chatId, "Hello! I am Bot.\nWhat is you name?")
+        bot.send_message(message.chat.id, "Hello! I am Bot.\nWhat is you name?")
         bot.register_next_step_handler(message, process_NAME_step)
         # иначе
     else:
         # приветствует
-       bot.send_message(chatId, f"Welcome, {text}!")
+       bot.send_message(message.chat.id, f"Welcome, {message.text}!")
 
 
 def process_NAME_step(message):
     "запрашивает секретный ключ"
-    chatId = message.chat.id
-    name = message.text
     # раннее полученное имя сохраняет
-    users[chatId] = name
-    bot.send_message(chatId, 'SECRET KEY: ')
+    users[message.chat.id] = message.text
+    bot.send_message(message.chat.id, 'SECRET KEY: ')
     bot.register_next_step_handler(message, process_SECRET_step)
 
 
 def process_SECRET_step(message):
     "проверяет правильно ли пользователь ввел код"
-    chatId = message.chat.id
-    SECRET = message.text
     # если все гуд
-    if SECRET == 'secret':
+    if message.text == 'secret':
         # приветствует и предоставляет информацию от командах
-        bot.send_message(chatId, f"Welcome, {users[chatId]}!")
+        bot.send_message(message.chat.id, f"Welcome, {users[message.chat.id]}!")
         command_help(message)
     else:
         # в случае неправильного ввода опять запрашивает ключ
-        bot.send_message(chatId, 'SECRET KEY: ')
+        bot.send_message(message.chat.id, 'SECRET KEY: ')
         bot.register_next_step_handler(message, process_SECRET_step)
 
 
 @bot.message_handler(commands=['help'])
 def command_help(message):
-    chatId = message.chat.id
     msg = text(bold('Доступны следующие команды: \n'),
                '/help - Предоставляет информацию о доступных командах\n',
                '/run - Запускает CryptoBot\n', '/stop - Останавливает CryptoBot\n',
                '/balance - Предоставляет информацию о текущем балансе')
-    bot.send_message(chatId, msg, parse_mode=ParseMode.MARKDOWN)
+    bot.send_message(message.chat.id, msg, parse_mode=ParseMode.MARKDOWN)
 
 @bot.message_handler(commands=['run'])
 def run_cryptobot(message):
@@ -72,7 +65,6 @@ def run_cryptobot(message):
         cryptobot.start_trading()
     except KeyError:
         pass
-
     bot.send_message(message.chat.id, 'CryptoBot запущен')
 
 
@@ -85,7 +77,7 @@ def balance(message):
     except Exception:
         pass
     else:
-        bot.send_message(message.chat.id, f'Ваш баланс: {str(fetch_balance)}')
+        bot.send_message(message.chat.id, f'Ваш баланс: {fetch_balance}')
 
 
 @bot.message_handler(commands=['stop'])
