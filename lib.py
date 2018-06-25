@@ -6,4 +6,4 @@ from datetime import datetime
 
 def utc_now():
     x = ntplib.NTPClient()
-    return str(datetime.utcfromtimestamp(x.request('pool.ntp.org').tx_time)).replace(' ', 'T')[:23] + 'Z'
+    return str(datetime.utcfromtimestamp(x.request('th.pool.ntp.org').tx_time)).replace(' ', 'T')[:23] + 'Z'

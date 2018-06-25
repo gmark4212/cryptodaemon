@@ -93,8 +93,8 @@ SERVER_ERROR = 500
 WRONG_DATA = 400
 
 # request keys
-AK = 'api_keys'
+AKEY = 'api_keys'
 ACTION = 'action'
-PK = 'public_key'
-SK = 'secret_key'
+PKEY = 'public_key'
+SKEY = 'secret_key'
 EXCHANGE = 'exchange'
