@@ -63,7 +63,8 @@ class PostHandler(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         data = json.loads(body.decode(ENCODING))
-        self.server.process_query(data)
+        responce = self.server.process_query(data)
+        self.respond(responce[0], responce[1])
 
     def respond(self, code, answer):
         self.send_response(code)
@@ -92,34 +93,31 @@ class Server(HTTPServer):
                     if EXCHANGE in api and PKEY in api and SKEY in api:
                         ex = SUPPORTED_EXCHANGES[api[EXCHANGE]]
                         if ex is None:
-                            self.respond(WRONG_DATA, 'Non supported exchange!')
-                            return False
+                            return [WRONG_DATA, 'Non supported exchange!']
                         else:
                             api[EXCHANGE] = ex(self.keys_structured(api[PKEY], api[SKEY]))
                     else:
-                        self.respond(WRONG_DATA, 'Exchange or API-key unfilled!')
-                        return False
+                        return [WRONG_DATA, 'Exchange or API-key unfilled!']
                 else:
-                    self.respond(WRONG_DATA, 'Not see key {} in your data!'.format(AKEY))
-                    return False
+                        return [WRONG_DATA, 'Not see key {} in your data!'.format(AKEY)]
 
                 started = self.pm.add_worker(data)
                 print(self.pm.workers)
                 if started is None:
-                    self.RequestHandlerClass.respond(WRONG_DATA, 'CryptoDaemon already started')
+                    return [WRONG_DATA, 'CryptoDaemon already started']
                 elif started:
-                    self.RequestHandlerClass.respond(SUCCESS, 'CryptoDaemon started successfully')
+                    return [SUCCESS, 'CryptoDaemon started successfully']
                 else:
-                    self.respond(SERVER_ERROR, 'ERR: Shit happened. ')
+                    return [SERVER_ERROR, 'ERR: Shit happened. ']
             elif act == 'stop':
                 if self.pm.kill_worker(data['id']):
-                    self.respond(SUCCESS, 'CryptoDaemon instance stopped')
+                        return [SUCCESS, 'CryptoDaemon instance stopped']
                 else:
-                    self.respond(SERVER_ERROR, 'ERR: Can not find your worker process by id..,')
+                    return [SERVER_ERROR, 'ERR: Can not find your worker process by id..,']
             elif act == 'get-alive-workers':
-                self.respond(SUCCESS, str(self.pm.get_alive_workers()))
+                return [SUCCESS, str(self.pm.get_alive_workers())]
             else:
-                self.respond(WRONG_DATA, 'Unknown action!')
+                return [WRONG_DATA, 'Unknown action!']
 
 
 if __name__ == '__main__':
