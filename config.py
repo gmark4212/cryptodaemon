@@ -70,13 +70,12 @@ LIMIT = 'limit'
 # database
 MONGODB_PORT = 27017
 MONGO_DB_NAME = 'cryptodaemon'
-STORE_HISTORY = False
+STORE_HISTORY = True
 
 # collections
 HISTORY = 'history'
 ORDERS = 'orders'
-WORKERS = 'workers'
-LOGS = 'logs'
+BALANCES = 'balances'
 
 # telegram
 TOKEN = '602258813:AAHBxMU8FfXHRo4mD3ZyyLobgHdvO8yUWtU'
@@ -91,6 +90,7 @@ COMMANDS = {
 SUCCESS = 200
 SERVER_ERROR = 500
 WRONG_DATA = 400
+NOT_IMPLEMENTED = 501
 
 # request keys
 AKEY = 'api_keys'

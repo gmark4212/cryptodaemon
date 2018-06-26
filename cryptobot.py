@@ -10,11 +10,12 @@ from storage import BotDataStorage
 
 
 class CryptoBot:
-    def __init__(self, trading_strategy, emulation_mode=False):
+    def __init__(self, trading_strategy, emulation_mode=False, uid=None):
         self.money_per_buy_order = 0
         self.keep_working = True
         self._buy_orders = []
         self._sell_orders = []
+        self.uid = uid
         self.db = BotDataStorage() if STORE_HISTORY else None
         self.emulated = emulation_mode
         if isinstance(trading_strategy, Strategy):
@@ -139,7 +140,7 @@ class CryptoBot:
 
     def store_history(self, order):
         if self.db:
-            self.db.add_entry(HISTORY, dict(utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
+            self.db.add_entry(HISTORY, dict(uid=self.uid, utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
 
     def stop_trading(self):
         self.keep_working = False
@@ -149,6 +150,6 @@ class CryptoBot:
         print('Daemon killed...')
 
 
-if __name__ == '__main__':
-    bot = CryptoBot(Strategy(), '-e' in sys.argv)
-    bot.start_trading()
+# if __name__ == '__main__':
+#     bot = CryptoBot(Strategy(), '-e' in sys.argv)
+#     bot.start_trading()

@@ -7,6 +7,7 @@ from io import BytesIO
 import json
 from strategy import Strategy
 from cryptobot import CryptoBot
+from storage import BotDataStorage
 from multiprocessing import Process
 
 
@@ -15,14 +16,15 @@ class ProcessManager:
         self.workers = {}
 
     def add_worker(self, data):
-        if self.request_is_valid(data) and self.find_worker(data['id']) is None:
+        uid = data['id']
+        if self.request_is_valid(data) and self.find_worker(uid) is None:
             ss = 'strategy-settings'
             strategy_settings = data[ss] if ss in data else {}
-            cb = CryptoBot(Strategy(data['api_keys']['exchange'], **strategy_settings), True)
+            cb = CryptoBot(Strategy(data['api_keys']['exchange'], **strategy_settings), True, uid=uid)
             stream = Process(target=cb.start_trading)
             try:
                 stream.start()
-                self.workers[data['id']] = dict(process=stream, bot=cb)
+                self.workers[uid] = dict(process=stream, bot=cb)
                 print(self.workers)
                 return True
             except Exception as e:
@@ -56,15 +58,12 @@ class ProcessManager:
 
 class PostHandler(BaseHTTPRequestHandler):
 
-    def __init__(self, *args, **kwargs):
-        super(BaseHTTPRequestHandler, self).__init__(*args, **kwargs)
-
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         data = json.loads(body.decode(ENCODING))
-        responce = self.server.process_query(data)
-        self.respond(responce[0], responce[1])
+        response = self.server.process_query(data)
+        self.respond(response[0], response[1])
 
     def respond(self, code, answer):
         self.send_response(code)
@@ -77,6 +76,7 @@ class PostHandler(BaseHTTPRequestHandler):
 class Server(HTTPServer):
     def __init__(self, *args, **kwargs):
         self.pm = ProcessManager()
+        self.db = BotDataStorage()
         super(HTTPServer, self).__init__(*args, **kwargs)
 
     @staticmethod
@@ -87,6 +87,7 @@ class Server(HTTPServer):
         if ACTION in data:
             # set exchange by name + api key
             act = data[ACTION]
+            uid = data['id']
             if act == 'start':
                 if AKEY in data:
                     api = data[AKEY]
@@ -102,24 +103,35 @@ class Server(HTTPServer):
                         return [WRONG_DATA, 'Not see key {} in your data!'.format(AKEY)]
 
                 started = self.pm.add_worker(data)
-                print(self.pm.workers)
                 if started is None:
                     return [WRONG_DATA, 'CryptoDaemon already started']
                 elif started:
                     return [SUCCESS, 'CryptoDaemon started successfully']
                 else:
-                    return [SERVER_ERROR, 'ERR: Shit happened. ']
+                    return [SERVER_ERROR, 'ERR: Shit happened.']
             elif act == 'stop':
-                if self.pm.kill_worker(data['id']):
+                if self.pm.kill_worker(uid):
                         return [SUCCESS, 'CryptoDaemon instance stopped']
                 else:
-                    return [SERVER_ERROR, 'ERR: Can not find your worker process by id..,']
+                    return [SERVER_ERROR, 'ERR: Can not find your worker process by id']
             elif act == 'get-alive-workers':
                 return [SUCCESS, str(self.pm.get_alive_workers())]
+            elif act == 'get-balance':
+                #todo: how to get balance from process??
+                if uid in self.pm.workers:
+                    cb = self.pm.workers[uid]['bot']
+                    if isinstance(cb, CryptoBot):
+                        return [SUCCESS, str(cb.base_balance)]
+                return [NOT_IMPLEMENTED, 'Your bot is not alive']
+            elif act == 'get-history':
+                #todo: problem: MongoClient opened before fork. Create MongoClient only after forking.
+                return [SUCCESS, str(self.db.get_entries(HISTORY, _filter={'uid': uid}))]
             else:
                 return [WRONG_DATA, 'Unknown action!']
 
 
 if __name__ == '__main__':
     httpd = Server((DEFAULT_HOST, API_PORT), PostHandler)
+    print('CryptoDaemon server starting...')
     httpd.serve_forever()
+
