@@ -20,7 +20,7 @@ class ProcessManager:
         if self.request_is_valid(data) and self.find_worker(uid) is None:
             ss = 'strategy-settings'
             strategy_settings = data[ss] if ss in data else {}
-            cb = CryptoBot(Strategy(data['api_keys']['exchange'], **strategy_settings), True, uid=uid)
+            cb = CryptoBot(Strategy(data['api_keys']['exchange'], **strategy_settings), emulation_mode=True, uid=uid)
             stream = Process(target=cb.start_trading)
             try:
                 stream.start()
@@ -115,23 +115,25 @@ class Server(HTTPServer):
                 else:
                     return [SERVER_ERROR, 'ERR: Can not find your worker process by id']
             elif act == 'get-alive-workers':
-                return [SUCCESS, str(self.pm.get_alive_workers())]
+                try:
+                    return [SUCCESS, str(self.pm.get_alive_workers())]
+                except:
+                    return [SERVER_ERROR, 'ERR: Impossible to get active workers']
             elif act == 'get-balance':
-                #todo: how to get balance from process??
-                if uid in self.pm.workers:
-                    cb = self.pm.workers[uid]['bot']
-                    if isinstance(cb, CryptoBot):
-                        return [SUCCESS, str(cb.base_balance)]
-                return [NOT_IMPLEMENTED, 'Your bot is not alive']
+                try:
+                    return [SUCCESS, str(self.db.get_entries(BALANCES, _filter={'uid': uid}))]
+                except:
+                    return [SERVER_ERROR, 'ERR: I can not get balances']
             elif act == 'get-history':
-                #todo: problem: MongoClient opened before fork. Create MongoClient only after forking.
-                return [SUCCESS, str(self.db.get_entries(HISTORY, _filter={'uid': uid}))]
+                try:
+                    return [SUCCESS, str(self.db.get_entries(HISTORY, _filter={'uid': uid}))]
+                except:
+                    return [SERVER_ERROR, 'ERR: DB problem... can not get history']
             else:
                 return [WRONG_DATA, 'Unknown action!']
 
 
 if __name__ == '__main__':
     httpd = Server((DEFAULT_HOST, API_PORT), PostHandler)
-    print('CryptoDaemon server starting...')
+    print('CryptoDaemon server started')
     httpd.serve_forever()
-

@@ -84,8 +84,6 @@ class FakeExchange(DEFAULT_EXCH_CLASS):
             'info': None,
         }
         order = self.parse_order(response)
-        if self.db:
-            self.db.add_entry(ORDERS, order)
         id = order['id']
         self.orders[id] = order
         return order

@@ -6,7 +6,7 @@ from lib import *
 from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
-from storage import BotDataStorage
+from storage import BotDataStorage as Bds
 
 
 class CryptoBot:
@@ -16,7 +16,6 @@ class CryptoBot:
         self._buy_orders = []
         self._sell_orders = []
         self.uid = uid
-        self.db = BotDataStorage() if STORE_HISTORY else None
         self.emulated = emulation_mode
         if isinstance(trading_strategy, Strategy):
             self.strategy = trading_strategy
@@ -87,11 +86,16 @@ class CryptoBot:
         self.keep_working = True
         self.base_balance[LIMIT] = self.get_funds_stop_limit()
         s = self.strategy
+        db = Bds()
         print('Starting trade...')
+
         if s.type == ROLLBACK:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
                 print('ACCOUNT BALANCE: ', self.base_balance)
+
+                db.replace_entry(BALANCES, dict(uid=self.uid), dict(uid=self.uid, balance=self.base_balance))
+
                 if float(self.base_balance[AVAILABLE]) > self.base_balance[LIMIT]:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
@@ -127,7 +131,7 @@ class CryptoBot:
                         self._sell_orders.append(sell_order)
                         if self.emulated:
                             self.exchange.buy_executed_money_shift(price * buy_amount)
-                        self.store_history(buy_order)
+                        self.store_history(buy_order, db)
                         self._buy_orders.remove(buy_order)
 
                 sleep(INTERVAL)
@@ -135,12 +139,12 @@ class CryptoBot:
                     if self.get_order_state(sell_order) == EXECUTED:
                         if self.emulated:
                             self.exchange.sell_executed_money_shift(float(sell_order['price']) * float(sell_order['amount']))
-                        self.store_history(sell_order)
+                        self.store_history(sell_order, db)
                         self._sell_orders.remove(sell_order)
 
-    def store_history(self, order):
-        if self.db:
-            self.db.add_entry(HISTORY, dict(uid=self.uid, utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
+    def store_history(self, order, db=None):
+        if db:
+             db.add_entry(HISTORY, dict(uid=self.uid, utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
 
     def stop_trading(self):
         self.keep_working = False
@@ -150,6 +154,7 @@ class CryptoBot:
         print('Daemon killed...')
 
 
-# if __name__ == '__main__':
-#     bot = CryptoBot(Strategy(), '-e' in sys.argv)
-#     bot.start_trading()
+if __name__ == '__main__':
+    # bot = CryptoBot(Strategy(), '-e' in sys.argv)
+    bot = CryptoBot(Strategy(), True)
+    bot.start_trading()

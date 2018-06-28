@@ -9,13 +9,11 @@ class BotDataStorage:
         try:
             self.client = MongoClient('{}:{}'.format(DEFAULT_HOST, MONGODB_PORT))
             self.db = self.client[MONGO_DB_NAME]
-            self.orders = self.db.orders
+            # self.orders = self.db.orders
             self.history = self.db.history
             self.balances = self.db.balances
-            status = 'OK'
         except Exception as e:
-            status = 'ERROR: ' + str(e)
-        print('MongoDB status... ' + status)
+            print('ERROR: ' + str(e))
 
     def get_entries(self, collection_name=None, _filter={}):
         if bool(collection_name) and hasattr(self, collection_name):
@@ -25,6 +23,10 @@ class BotDataStorage:
         if bool(collection_name) and hasattr(self, collection_name) and isinstance(data, dict):
             getattr(self, collection_name).insert_one(data)
 
-    def update_entry(self, collection_name=None, _filter=None, data=None):
-        if bool(collection_name) and hasattr(self, collection_name) and isinstance(_filter, dict) and isinstance(data, dict):
-            getattr(self, collection_name).update_one(_filter, {'$set': data}, upsert=False)
+    def update_entry(self, collection_name=None, _filter={}, data=None):
+        if bool(collection_name) and hasattr(self, collection_name) and isinstance(data, dict):
+            getattr(self, collection_name).update_one(_filter, {'$set': data}, upsert=True)
+
+    def replace_entry(self, collection_name=None, _filter={}, data=None):
+        if bool(collection_name) and hasattr(self, collection_name) and isinstance(data, dict):
+            getattr(self, collection_name).replace_one(_filter, data, upsert=True)
