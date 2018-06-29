@@ -6,7 +6,7 @@ from lib import *
 from strategy import Strategy
 from time import sleep
 from mock import FakeExchange
-from storage import BotDataStorage as Bds
+from storage import BotDataStorage
 
 
 class CryptoBot:
@@ -86,7 +86,8 @@ class CryptoBot:
         self.keep_working = True
         self.base_balance[LIMIT] = self.get_funds_stop_limit()
         s = self.strategy
-        db = Bds()
+        # db initialises here due problem to writing mongo from fork
+        db = BotDataStorage()
         print('Starting trade...')
 
         if s.type == ROLLBACK:
@@ -144,7 +145,7 @@ class CryptoBot:
 
     def store_history(self, order, db=None):
         if db:
-             db.add_entry(HISTORY, dict(uid=self.uid, utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
+            db.add_entry(HISTORY, dict(uid=self.uid, utc=utc_now(), balance=self.exchange.fetch_balance(), order=order))
 
     def stop_trading(self):
         self.keep_working = False
