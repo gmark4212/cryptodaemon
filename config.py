@@ -6,11 +6,14 @@ from ccxt import hitbtc2, poloniex, exmo
 
 # general
 APP_NAME = 'CryptoDaemonBot'
-APP_VERSION = '0.3'
+APP_VERSION = '0.5'
 INTERVAL = 6
 DEFAULT_HOST = '127.0.0.1'
 API_PORT = 8888
 ENCODING = 'utf-8'
+
+# stat consumer api
+STAT_CONSUMER = 'http://{}/bot_api/stat'.format(DEFAULT_HOST)
 
 # emulation
 FAKE_DEPOSIT = 2

@@ -67,7 +67,7 @@ class CryptoBot:
             typer = STOP_LIMIT if side == SELL else LIMIT
             params = dict(stopPrice=price) if side == SELL else {}
             order = self.exchange.create_order(symbol, typer, side, amount, price, params)
-            print('+ NEW ORDER: ', order['side'], order['symbol'], order['price'],
+            wprint(self.uid, '+ NEW ORDER: ', order['side'], order['symbol'], order['price'],
                   order['amount'], order['id'], order['datetime'])
             if self.emulated and side == BUY and isinstance(order, dict):
                 self.exchange.buy_new_money_shift(amount * price)
@@ -88,36 +88,36 @@ class CryptoBot:
         s = self.strategy
         # db initialises here due problem to writing mongo from fork
         db = BotDataStorage()
-        print('Starting trade...')
+        wprint(self.uid, 'Starting trade...')
 
         if s.type == ROLLBACK:
             while self.keep_working:
                 self.base_balance = self.fetch_balance()
-                print('ACCOUNT BALANCE: ', self.base_balance)
+                wprint(self.uid, 'ACCOUNT BALANCE: ', self.base_balance)
 
                 db.replace_entry(BALANCES, dict(uid=self.uid), dict(uid=self.uid, balance=self.base_balance))
 
                 if float(self.base_balance[AVAILABLE]) > self.base_balance[LIMIT]:
                     s.fetch_suitable_coins()
                     tickers_quantity = len(s.suitable_tickers)
-                    print('SUITABLE COINS: ', s.suitable_tickers)
+                    wprint(self.uid, 'SUITABLE COINS: ', s.suitable_tickers)
                     if tickers_quantity > 0:
                         whole_money_to_spend = self.get_summ_to_spend_to_buy()
-                        print('MONEY TO SPEND: ', whole_money_to_spend)
+                        wprint(self.uid, 'MONEY TO SPEND: ', whole_money_to_spend)
                         if whole_money_to_spend > 0:
                             self.money_per_buy_order = whole_money_to_spend/tickers_quantity
-                            print('MONEY FOR 1 ORDER: ', self.money_per_buy_order)
+                            wprint(self.uid, 'MONEY FOR 1 ORDER: ', self.money_per_buy_order)
                             for ticker in s.suitable_tickers:
                                 symbol = '{}/{}'.format(ticker, BASE_TICKER)
                                 price = self.fetch_prices(symbol)
-                                print('LAST PRICE FOR {}: {} '.format(symbol, price))
+                                wprint(self.uid, 'LAST PRICE FOR {}: {} '.format(symbol, price))
                                 if price > 0:
                                     amount = self.money_per_buy_order/price
                                     if amount > 0:
-                                        print('AMOUNT TO BUY {}: {} '.format(symbol, amount))
+                                        wprint(self.uid, 'AMOUNT TO BUY {}: {} '.format(symbol, amount))
                                         self._buy_orders.append(self.place_order(symbol, amount, price, BUY))
                     else:
-                        print('No suitable coins for this strategy at the moment')
+                        wprint(self.uid, 'No suitable coins for this strategy at the moment')
                 # else:
                 #     print('You are out of funds ', self.base_balance)
 
@@ -152,7 +152,7 @@ class CryptoBot:
         self.__del__()
 
     def __del__(self):
-        print('Daemon killed...')
+        wprint(self.uid, 'Daemon killed...')
 
 
 if __name__ == '__main__':
