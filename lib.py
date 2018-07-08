@@ -14,7 +14,7 @@ def utc_now():
 def wprint(uid, *args):
     message = ''
     for i in args:
-        message += str(i)
+        message += str(i) + ' '
     print(message)
     try:
         requests.post(STAT_CONSUMER, data=dict(id=uid, stat_message=message))
