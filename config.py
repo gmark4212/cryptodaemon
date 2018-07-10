@@ -13,7 +13,7 @@ API_PORT = 8888
 ENCODING = 'utf-8'
 
 # stat consumer api
-STAT_CONSUMER = 'http://{}/bot_api/stat'.format(DEFAULT_HOST)
+STAT_CONSUMER = 'http://{}/bot_api/stat/'.format(DEFAULT_HOST)
 
 # emulation
 FAKE_DEPOSIT = 2

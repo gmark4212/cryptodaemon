@@ -20,6 +20,7 @@ def wprint(uid, *args):
             title += str(i) + ' '
         else:
             ext += str(i) + ' '
+    print(title, ext)
     try:
         requests.post(STAT_CONSUMER, data=json.dumps(dict(id=uid, stat_message=title, ext_stat_message=ext)))
     except:
