@@ -3,6 +3,7 @@
 from config import *
 import ntplib
 import requests
+import json
 from datetime import datetime
 
 
@@ -12,11 +13,14 @@ def utc_now():
 
 
 def wprint(uid, *args):
-    message = ''
+    title = ''
+    ext = ''
     for i in args:
-        message += str(i) + ' '
-    print(message)
+        if args.index(i) == 0:
+            title += str(i) + ' '
+        else:
+            ext += str(i) + ' '
     try:
-        requests.post(STAT_CONSUMER, data=dict(id=uid, stat_message=message))
+        requests.post(STAT_CONSUMER, data=json.dumps(dict(id=uid, stat_message=title, ext_stat_message=ext)))
     except:
         pass
