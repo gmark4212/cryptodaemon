@@ -13,7 +13,8 @@ API_PORT = 8888
 ENCODING = 'utf-8'
 
 # stat consumer api
-STAT_CONSUMER = 'http://{}/bot_api/stat/'.format(DEFAULT_HOST)
+# STAT_CONSUMER = 'http://{}:8000/bot_api/stat/'.format(DEFAULT_HOST)
+STAT_CONSUMER = 'https://cryptodaemon.cloud/bot_api/stat/'
 
 # emulation
 FAKE_DEPOSIT = 2
